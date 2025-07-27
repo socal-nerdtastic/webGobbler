@@ -18,7 +18,7 @@ import time, threading, os, logging
 try:
     import ctypes
 except ImportError:
-    raise ImportError, "The ctypes module is required for module wgx11screensaver. See http://starship.python.net/crew/theller/ctypes/"
+    raise ImportError("The ctypes module is required for module wgx11screensaver. See http://starship.python.net/crew/theller/ctypes/")
 
 # XSetWindowAttributes Structure defined in X11/Xlib.h. It contains the attributes of a X window.
 # We need it to change the override_redirect field to get a full screen window
@@ -85,12 +85,12 @@ class XColor(ctypes.Structure):
 
 # Xlib constants defined in X11/X.h
 class X11_con:
-    GCForeground=1L<<2
-    CWOverrideRedirect=1L<<9
-    CWCursor=1L<<14
-    KeyPressMask=1L<<0
+    GCForeground=1<<2
+    CWOverrideRedirect=1<<9
+    CWCursor=1<<14
+    KeyPressMask=1<<0
     RevertToParent=2
-    CurrentTime=0L
+    CurrentTime=0
     KeyPress= 2
     
 
@@ -115,7 +115,7 @@ class x11screensaver(threading.Thread):
         # Connection to the X-server
         self.display=self.xlib.XOpenDisplay(0)
         if self.display == 0:
-            raise OSError, "I can't connect to your X server. Did you launch it?"
+            raise OSError("I can't connect to your X server. Did you launch it?")
         # Default Screen
         self.screen=self.xlib.XDefaultScreen(self.display)
         # The window parent
@@ -241,7 +241,7 @@ class x11screensaver(threading.Thread):
 def no_xlib():
     '''Raise an error if we can't find your xlib'''
 
-    raise OSError, '''I can't find your X11 protocol client shared library. 
+    raise OSError('''I can't find your X11 protocol client shared library. 
     You should verify that "Xlib" package is installed on your machine.
     For example this package is called "libx11-6" on a Debian Gnu/Linux system.
     If you suspect a bug or need help, please send me an email at chantecode@gmail.com
@@ -250,7 +250,7 @@ def no_xlib():
     ls -lR /usr/lib
     ls -lR /lib
     Please write the name and the version of your Unix/Linux distribution.
-    Thanks'''           
+    Thanks''')           
             
 def get_unix_lib():
     '''Same as get_unix_lib in webgobbler.py (will be defined on it)'''
@@ -267,7 +267,7 @@ def getScreenResolution():
     # Connect to the x server...
     display=xlib.XOpenDisplay(0)    
     if display == 0:
-        raise OSError, "I can't connect to your X server. Did you launch it?"
+        raise OSError("I can't connect to your X server. Did you launch it?")
     screen=xlib.XDefaultScreen(display)
     # Get the height and width and return it in a tuple: (x, y)
     height=xlib.XDisplayHeight(display, screen)

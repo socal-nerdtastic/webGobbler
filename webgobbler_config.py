@@ -20,7 +20,7 @@ Note: this configuration GUI is still kept outside the main webgobbler code
 try:
     import Pmw
 except ImportError:
-    raise ImportError, "The Pmw (Python Megawidgets) module is required for the webGobbler configuration GUI. See http://pmw.sourceforge.net/"
+    raise ImportError("The Pmw (Python Megawidgets) module is required for the webGobbler configuration GUI. See http://pmw.sourceforge.net/")
 
 import os, os.path
 import hashlib
@@ -29,27 +29,27 @@ if os.path.isdir('libtcltk84'):
     os.environ['TCL_LIBRARY'] = 'libtcltk84\\tcl8.4'
     os.environ['TK_LIBRARY'] =  'libtcltk84\\tk8.4'
     
-import Tkinter
-import tkFont
-import tkFileDialog
+import tkinter
+import tkinter.font
+import tkinter.filedialog
 
 try:
     import webgobbler   # We import the webGobbler module.
 except ImportError:
-    raise ImportError, "The webGobbler module is required to run this webGobbler configuration GUI. See http://sebsauvage.net/python/webgobbler/"
+    raise ImportError("The webGobbler module is required to run this webGobbler configuration GUI. See http://sebsauvage.net/python/webgobbler/")
 
 try:
     import Image
     import ImageTk
-    import tkSimpleDialog
+    import tkinter.simpledialog
 except ImportError:
-  raise ImportError, "The PIL (Python Imaging Library) is required to run this program. See http://www.pythonware.com/products/pil/"
+  raise ImportError("The PIL (Python Imaging Library) is required to run this program. See http://www.pythonware.com/products/pil/")
 
-import StringIO, base64 
+import io, base64 
 
 
 def main():
-    root = Tkinter.Tk()             # Initialize Tkinter
+    root = tkinter.Tk()             # Initialize Tkinter
     root.withdraw()                 # Hide the main root window
     Pmw.initialise(root)            # Initialize Pmw
     wgconfig = wg_confGUI(root)     # Build the GUI.
@@ -58,7 +58,7 @@ def main():
 # FIXME: allow to choose where to save to/load from ? (combo with .ini file/registry ?)
 
 
-class wg_confGUI(Tkinter.Toplevel):  # FIXME: Should I derive from Frame so that I can be included ?
+class wg_confGUI(tkinter.Toplevel):  # FIXME: Should I derive from Frame so that I can be included ?
     '''
     Example:
         root = Tkinter.Tk()             # Initialize Tkinter
@@ -74,7 +74,7 @@ class wg_confGUI(Tkinter.Toplevel):  # FIXME: Should I derive from Frame so that
         self._parent.wait_window(wgconfig.top)  # Wait for window to close.
     '''
     def __init__(self,parent):
-        Tkinter.Toplevel.__init__(self, parent)
+        tkinter.Toplevel.__init__(self, parent)
         self.top = self
         # the following dictionnary will keep a refenrece to all the widgets/variables
         # we need to read/write information from/to.
@@ -93,7 +93,7 @@ class wg_confGUI(Tkinter.Toplevel):  # FIXME: Should I derive from Frame so that
     def _setICONS(self):
         ''' Here are all the icons used by the GUI '''
         # Yeah... I know it's bad to have base64 data in code. Sue me.
-        self._ICONS = {'normal': Tkinter.PhotoImage(master=self.top,data="""
+        self._ICONS = {'normal': tkinter.PhotoImage(master=self.top,data="""
 R0lGODlhIAAgAIUAAQBygwBzhQJ3iXtygx7DRxzDSxrFVxfIb2SFME+XNwqClACTqimVpQC30hLN
 jAzSsQXO0ADe/wHe/gHd/ATd+wLY8wDN7Bfg/zXk/zjlxmCnsX+4wGbqmFLo9nft/7k8Fbg8RrBE
 T7FCQcA2E/8AAP8EB/8FCP8cLv80VP9rrv92wKTyWv//APn+Bff9CP//F834Moi9xZnGzaTy/ovv
@@ -106,7 +106,7 @@ T+JIQXMlCFDrcDoseRIFhwkTHFuOJNJv58aTKmimAOlw4DedDkQcRXmj6kYRTZRUeODggIECBw48
 gFCkwIepKEyoBSmhAoQDBQjInRuXgFh9EsyiBeqRhIgHBgjUnUuY7oO8Z01StXHD5wi6gwsTBquX
 RAoVmDGvfCy5M92viT+W6MvZs+kCCRCoXs06genXsGPLnj07CAA7
 """),
-'emboss':Tkinter.PhotoImage(master=self.top,data="""
+'emboss':tkinter.PhotoImage(master=self.top,data="""
 R0lGODlhIAAgAIYAAU5wdEx8hFR+hCTqVSTqZGS+dEzObFTHbFzCc1vCfCTwlBLL8wT+/Bb+/DnO
 5DTe/Dzc8jze/CzR9Dri9i3w+DzA1FeEilaMlEyntmqqslSYpEy7ylzChU/OkFHKsnzWrEvH2VbP
 0krO5EzS5ETS5EzS9EzW90TX+1fT5FTO5GzZ2LF3XLR2fNwzM/wbOuQnJPkoMPwnSPY+SdpJR9xO
@@ -127,7 +127,7 @@ UYCCBxxwopDAkggkkOSMKTjCwAAzxOCjDTD8h4MOFMhYQAJNIhBmmE52YBuVPVpBYnhMAKmDAh0g
 wIGYCHxZQJ11gplABwqgaQMTTgQa6A02rKDAnHmOqaeYdx4wwAA4uOBCDJRWKmkNHRyg55125vml
 mAY8qsMKpJZqqg6f3rmoonk6OoABCBxQgKYH0BnrAQbgesCuuCagqwEGJADso8QWa+yxyB4bCAA7
 """),
-'invert':Tkinter.PhotoImage(master=self.top,data="""
+'invert':tkinter.PhotoImage(master=self.top,data="""
 R0lGODlhIAAgAIUAAQAAAAAABA8EBwAALjIQCwAAUgAAZABiAQBoCQBwFgB/L1sNAGU4MXQQNXdC
 OgAA5wAA/wUB+QgC9zIHzVoMpACIPgCTUADKqgD//wD7+AD69z/J7ADj0U+7sE69vkfCuEbD6ogS
 AKwWCJgUZoBHP55YTcoaAOgeAP8hAP4hAf0hA/ohBPwmC/8yE/kwLsYaOOwycvItTv5ILP9rVPR8
@@ -139,7 +139,7 @@ LC0tvAxZcUKFQVBc+qHQwhAQjw4QI0rkgXBhQ4YoOmDYiEEDx40fLBK5iFEjhgQHUqbkgCHkPpJm
 OnhEqcCCTZYfQDUcCcgkg8oLGDJwzIln55CYG1HatAkSIcajTmB4SKoSAYKmT1jEgIFjhw4cOGK4
 YKgDBNULGtJu9JBixVYdOeLKlRt2hQoUZc96HBpjx9y/f3XEwGsWAwKVKYFuAMx47te8GGzWrFCB
 5eLGjHVozlH448fLmBvruGGjtOnTN0Jjhqu6tevXrYMAADs="""),
-'mirror':Tkinter.PhotoImage(master=self.top,data="""
+'mirror':tkinter.PhotoImage(master=self.top,data="""
 R0lGODlhIAAgAIUAAQBygwBzhQJ3iXtygx7DRxzDSxrFVxfIb2SFME+XNwqClACTqimVpQC30hLN
 jAzSsQXO0ADe/wHe/gHd/ATd+wLY8wDN7Bfg/zXk/zjlxmCnsX+4wGbqmFLo9nft/7k8Fbg8RrBE
 T7FCQcA2E/8AAP8EB/8FCP8cLv80VP9rrv92wKTyWv//APn+Bff9CP//F834Moi9xZnGzaTy/ovv
@@ -151,7 +151,7 @@ Mg1VEgsAywIKDAwa0RsbMTIyMdEMAMdVDQHLzODi4wENu0oVDQvrC80CAuQCCxBxbkL2RBUVFhVx
 OVo0gaLlSJhuJkxIclAicwmVKVTYfAkQggMHBwwYOODgQQWCPmuAHCrCQc4HBgho3cr1AAQjIiaa
 GFuzRsUPBSJg5cqWrYEHPsWWnYj2QNu7bEeQQHHjBsgbdAtkxUv4Q0cVKlLgUEmiBFrCkPVenPwY
 Mt4ECDJr3pyggOXPoEOHDgIAOw=="""),
-'norotation':Tkinter.PhotoImage(master=self.top,data="""
+'norotation':tkinter.PhotoImage(master=self.top,data="""
 R0lGODlhIAAgAIYAAQAAAABaAABfGgBkAAB0RQBgbx9kb18AX0JCAFhYAG9vbwAA/yoq1Ts74wB8
 jxZojyF6rwBL/0BAv0B4v1Z513JyygCGAAChAACrLwC7b1iWSH/rfgCKnx+AtByIuxqPwACR/wCs
 /zitxyi7/zC0/wDDjwDHpADSzwDD/wXO8gXP8wDX5ADY6gfX/wLY+gLY+wDe/w/Q8CLi/zDk/0OH
@@ -166,7 +166,7 @@ IUWCFtndEEGypIgYHo0QOcDywJKQT3zomElTh42UQwDoBIAggc+fGnr8GMqjJs2bghbm3Ml0ZwEc
 RqMihdFixIgHTbM+jWp06iAHWZtu5Xp0kAkMGASEZTqWrM1BcCUuXAiwdqeBIELy6tW7462guHPr
 6lTQpbDhw0ByiIAr18KAx5AfE+AQZcvhy11mFAIst7PnDDC4YL6smRBnz59Djz5cmjFq1KBFry7c
 +u9r2KpnZy7E4oTv38BPrMg9u/YmQlm0KF/OXIuM49A3BQIAOw=="""),
-'resuperpose':Tkinter.PhotoImage(master=self.top,data="""
+'resuperpose':tkinter.PhotoImage(master=self.top,data="""
 R0lGODlhIAAgAIYAAX85QVpaaFhoeFhgb39vfz9xglh2iXXdPEXXazKxlie7mwCowQCpwgCvyg22
 zzKzyxLQnw/Qow7Qog7QpQ3RqxDQoQ/TtS/UoyrUhwjVxgXY2gDM6gDe/wPe/wDa+gDW9gPa6DrI
 3STi/1yNiliHnFiQpFiMoX+AtkrXo1/ao1LakkTN4UzR5Vbo/n/u/3/u/YpASI1wc6tqcK1lWcB3
@@ -185,7 +185,7 @@ HNq1iLySwzn08CKUZtCc3eG9JTZ0fH/BkWCUdRb8A4JFFYxggAxcbKfDEEPUYIMRBk3x3zoppHCB
 MBFYoMFjHEwwQgwzLLFFEdwIAYQK11xzQQUSSBDBBIsoMoEGHY6wgwwiJqMEiUH0gIEwFcAYY5CJ
 CPJLgQbESIBELrgQUUOPmsAoZIxCJoIIIiMQQAAN3KQSRCUywkjKBAqEkgAPnnjyA5VEktKiIC1C
 IgklsxASpJsSTNBii1UKEqORfzoSCAA7"""),
-'rotation':Tkinter.PhotoImage(master=self.top,data="""
+'rotation':tkinter.PhotoImage(master=self.top,data="""
 R0lGODlhIAAgAIYAAQQCBAwKBAoQCiQmBAQ0BARWBAR0BAZXZGACYEx2PAQC/AwO/A0U9QQr/Cwq
 6Bx+tCR6rCR+rCZ4tAR4/EhmvHxohFxI2GwqlAScBASOBASiBASiDASmHASuMASyTAS6ZGymdByK
 uhicqByYxA+r2Ai88DKo3ATEjwTKsAnSzgTI+gTe/ATa/AjW+AfL6Dbl/CTY8FSWrGmo3ETmvFHI
@@ -203,19 +203,19 @@ urblHiYIeRAQ4DXkAX8DfMly2raO1YRQaCjg23cVLly++OCxA/UPRx02ZGge+QAV6Fy2iM/iQ0cM
 R8o3aCDgW8CBEjW6dIEuXjyXLldeJFKPQYMB0AQY0N8JWtRn4BbgcUHICRo02KAAAhSQgYMYpHCg
 geBhkcgJHDg4oQb9NeiBDRfWB14Nj5ygnoMspmBDgSVC54UqLnzAIogfDPLCFRfed4UqgqTggQbq
 bbALITVgH9GFfV3oB6QgKHSgwQmqwHCFFlxo8eSGR6rygpOEBAIAOw=="""),
-'debug':Tkinter.PhotoImage(master=self.top,data="""
+'debug':tkinter.PhotoImage(master=self.top,data="""
 R0lGODlhIAAgAIIAAf8A/wAAAOAgAIAAAOBgwP///0BAQGBgQCH5BAEAAAAALAAAAAAgACAAAgOn
 CLrc7uHJCaml8bY8uWbeVmkhCJbY46FWGHBvF1fva2SsAkOBQBQFgWBGcgkLBOHgkFOtfEllU1Kr
 Ca+CQbMG8gEJhgF2oO3oql6CWqnUslav9JhAJueM6ig7W+VihHp7fDwdWFdih29UhlmGZR8APY6O
 bpCSh4xlRC1jmY+bhYKHjwtTl4hjdiJ/jaN2oKZhWXVuEZtTOjd9G7g8W5DAvcCRwxegFAkAOw==
 """),
-'frequency':Tkinter.PhotoImage(master=self.top,data="""
+'frequency':tkinter.PhotoImage(master=self.top,data="""
 R0lGODlhIAAgAIIAAf////8A/wAAAMDAwICAgAAAgP8AAAD//yH5BAEAAAEALAAAAAAgACAAAgPV
 GLq88q/JSQWwmOp6h/Bb2HwDKDLRCK2ClKIA0SoPYd/3KxAXTIC1knA4sEU+vFlg5/HYBoCodAoo
 ypoy1IdJrRag1OJWifp1z1NxxXxBUwtRtYvdnlrcpjJYeo/2z3IOJV19f1QHMWRcZ3eGXYGLjHVn
 iJB0gB9uVVk0ZnCPEHtTcJZQn2GhZ6ScS5dUBkKapWgGmlGVrJFTtbZSgUuDu723iSOXvMObZDTB
 p5qnrHrJYdHS08obTKJe29ghOz/dviXVGjXhROQyyyLnODnsJzQsECIJADs="""),
-'imagesize':Tkinter.PhotoImage(master=self.top,data="""
+'imagesize':tkinter.PhotoImage(master=self.top,data="""
 R0lGODlhIAAgAMZAAPIACf8AAAB1h9YiDPsTI8U0E8ktNqFPHf8iOZ1UPASQpZhaZ2p/LwCet/8x
 UVqNL/83XEOiOm59jwHFUDKyQQ/ESFaRpkKmblCWq/9IegDNhR3HXhDLfP9RhSG41ADJ6ADTs/9b
 kRnPm/9emQDYygDb2gDZ9P9pqXKxu/9ssRDe/f94xkXnsv+M4f+Q6m/skv+c/pPwaK/T2qn1UH3t
@@ -231,19 +231,19 @@ IuBsEaCpAREb4pGbAMJoJ6UgYcBwMECqV6ucIgAYS7aAV6kEB5BdCwDD2bd38QgCCABhhN0RBAJY
 EMG3r9+/hlTMPQFD5woEes8FHgwjb9PE2wyZYOyi8tyGNEuUEDiw0AbGIcI1xexzQrwJHEgoMjSB
 sePRUOFW2KCaNeMWuF8ykB2Pg6EKcx2EC5d3N29yvwsMWM58+YPjyAtBh/57Om9DgQAAOw==
 """),
-'storage':Tkinter.PhotoImage(master=self.top,data="""
+'storage':tkinter.PhotoImage(master=self.top,data="""
 R0lGODlhIAAgAKL/AAAAAACAAMDAwICAgAD/AMDAwP///wAAACH5BAEAAAIALAAAAAAgACAAAANs
 KLrc/jDKSau9OOvNu39DKI5kSTZDoa5s67IDsKRvbYeyMBh87/9Anyi3sxkJSNVQUTTWAlAljmlw
 WgtLXdXELUlj1EJwDPwSt900LVsku3nm8NU4Zarv2QVgz+/7/34fgoOEhYaHiImKixgJADs=
 """),
-'workingdir':Tkinter.PhotoImage(master=self.top,data="""
+'workingdir':tkinter.PhotoImage(master=self.top,data="""
 R0lGODlhIAAgAKL/AP///+++3+vr677v5q50kXSumAAAAMDAwCH5BAEAAAcALAAAAAAgACAAAAPd
 eLrM9rDJ6SAh5uJIpc1BGDwBdj2dYoUGC7ZjmRldtonig8kWNtm44IhEGp1oDqELgmsxTUhVcUpg
 VYe6nQYJHO6aVeDro7qKYazQxWrcHmbpXO6am+lKm7XwToTYXnhZMEUbfmYaclhMPIdsXi2FRydg
 jn86fpA+cHNLl4hWgm95K1l5VYggJwuWhawuW6VRbzaSJrCYirJSmLu0eBpHKQ20rLfCHjMnRwYF
 usermAXS0s7Pq9MDA83V1tDZHN0pDwLk3OGr5OXn4gDq6xQGAO3m6/Hz7/Dy9O8oDAkAOw==
 """),
-'variante0':Tkinter.PhotoImage(master=self.top,data="""
+'variante0':tkinter.PhotoImage(master=self.top,data="""
 R0lGODlhIAAgAPf/AP///zExMf/n5+/W1s6trcalpXtjY2tCQpRaWntKSlIxMTkQEJwQEAgAABgA
 ACkAAOdCOecQAL1aUve1rWspIVIQCFIIAIRCOcZaSrVCMUoYEP9KMec5IVIpIZxCMYwxIcZKMZwp
 EFoQAHMxIaVSOXspEKUxEGsYAKWMhKVzY1I5Md5CEIwpCK1rUpxaQv+Ua+9jMTkQAM45AGtCMc5r
@@ -279,7 +279,7 @@ DB1QwQhCQAHpsaAE8UuPAzeRilDIohWVWMMGjyCFL8ABDnpwQwo6EQAKmKAEJQgBEHtFYIEqVKED
 oEgFYGQhC1PwAYNakIId+tCHHD7BBpkowQ+fNwKVPWAJoUhGK1JBRlCAYhWMkIIeQKGHKVZRBSp4
 AgVCsMUSnKBEDQBEAOLRCVBc4hKg0EQrWpGJTFSCD3zIQx+ksI97QOEDR/jACFB4Ag0AIh7JOMYx
 AgIAOw=="""),
-'variante1':Tkinter.PhotoImage(master=self.top,data="""
+'variante1':tkinter.PhotoImage(master=self.top,data="""
 R0lGODlhIAAgAPf/AP///xAQEBgYGDExMUpKSlJSUnt7e9bW1tbOzq2lpca9vZSMjJyUlIyEhIR7
 e2tjY1pSUmNaWlJKSkI5OTkxMaWMjGNSUko5OYRjY2NKSkIxMXtaWjkpKVI5OYRaWoxaWkIpKYxK
 ShAICAgAAIQ5MYxaUqVjWoRaUnNSSlo5MWNCOXNaUmtSSlI5MUIpIaV7a1pCOTkhGLWMe3NKOZx7
@@ -315,7 +315,7 @@ gC2gggFVUYpStIIRCwxDE7gwLCYwgQdHuAELvAWDFPjsg0WaAh/20AJOlKITnBjFAonBJgeBceGI
 U/ibBAZwARUQMAUtqMEb5mAmDYTCFKaYhRBHAQkWciEIiJAEF7JgA0Y8YAItcGLjCBiDSEhtAr4o
 RRZ/EQpZjAJurSiSJCTxCbmFoQYqUGMLZIUzfkzAGroIhSpUEQoJiEIUjIgkJCBxCDkEgREEYMRk
 VAADGBTJBgOwBy+ssYuAAAA7"""),
-'connected':Tkinter.PhotoImage(master=self.top,data="""
+'connected':tkinter.PhotoImage(master=self.top,data="""
 R0lGODlhIQCxANX/AP/////PL8DAwODg4N/f39DQ0M/Pz8DAwL+/v6+vr5+foJCQz5CQkICAgICA
 AIAAAHBwcGCQkGBgz2BgkGBgYF9fX1dXVy//YC+QkC+QLy9gYC8vkC8vLwD/AACQkACAAAB/fwAA
 /wAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
@@ -339,7 +339,7 @@ QmuAnApEEAEGDGMgsLvmNobnmBSz2aa4CmjbWJwcdxwnAx1kHDFnBFzsp54iU3AZlwgEW2egMEPa
 cF7tdNFTJ0DFzApQkYDYRYybp5gNTF1xxmtfPUTGXzbwrd7Kwk22xz8PofeXZu+tAAGD611yA2Yy
 0HcDHBQMgd5jdpm4AtSO24DjDORJAQdd1Kz3txQvXoDeZpv5OWc8U176lsKCzhrPk2ccBGgXQQAA
 Ow=="""),
-'localonly':Tkinter.PhotoImage(master=self.top,data="""
+'localonly':tkinter.PhotoImage(master=self.top,data="""
 R0lGODlhIQCxANX/AP/////PL8DAwP8AAODg4N/f39DQ0M/Pz8DAwL+/v6+vr6EAAJ+foJCQz5CQ
 kICAgICAAIAAAHBwcGCQkGBgz2BgkGBgYF9fX1dXVy//YC+QkC+QLy9gYC8vkC8vLwD/AACQkACA
 AAB/fwAA/wAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
@@ -365,7 +365,7 @@ Kx/QLAMTTKDB2Rp0nXTQjU3r69vHItszAzU3xuzdeDPrwAd0s81ZAXJnW23fFlx2awIcQ8vt4uvi
 87Kypw666wpQ4TgDVCjQexE+U9vrA67DTbfxsg9Bt64P6Fx9ycv/nrfmQ1Sva/DWM1CA99UD/kCw
 DmD/gAdgS1C9r7iSz8DLPj+QvgPUWuBBF5BXr/Pb5jNA9YIXLP1x5nLvA6CtOrY/1lzOfXTjVheC
 AAA7"""),
-'proxy':Tkinter.PhotoImage(master=self.top,data="""
+'proxy':tkinter.PhotoImage(master=self.top,data="""
 R0lGODlhIQCxAPf/AP/////PL8DAwODg4N/f397f3tDQ0M/Pz87Pzs3PzcrOysnOycfNx8bNxsXN
 xcLMwsDMwMDAwL+/v76/vri+uLe+t7DJsK+vr67Jrq6vrqrIqqqvqqmvqaGuoZ+foJ6fn52fnZyu
 nJufnJqumpqfm5ifmZefmJaulpafl5WglpCQz5CQkImRiYiRiIeRh4aShoGSgYCAgICAAIAAAHuT
@@ -408,7 +408,7 @@ NW36T25S85pArenpPAotD+QgB0JIqhCCKlQ6/lOXLxRmURHaJBBalXricyr5ttc9ZWaVfA09Hw7U
 17QOug+B8iNhHMmKv7NGNIH+g6AAmUdAihjwhwVRIAOt+jy5njCv3LMgCDNIEZHKEK8U7CEIRQgw
 ErbwrzRUIQtd+MIYQraGZMThDZvIQ74iNogGGKJmPWBEKyKRs0tE7RMLIsc24qqKV9ShFo+JRi8b
 TguMuhxjGZVYWzV+MYyuJcAb2RRHMGq1IAEBADs="""),
-'proxyauth':Tkinter.PhotoImage(master=self.top,data="""
+'proxyauth':tkinter.PhotoImage(master=self.top,data="""
 R0lGODlhIQCxAOb/AP//////AP/PL8DAwODg4N/f397f3tDQ0M/Pz87Pzs3PzcrOysnOycXNxcLM
 wsDAwL+/v76/vri+uLe+t6+vr66vrqmvqaGuoZ+foJ6fn52fnZyunJufnJqumpqfm5ifmZefmJau
 lpafl5WglpCQz5CQkImRiYiRiIaShoGSgYCAgICAAIAAAHuTe3eUd3WUdXKVcnBwcGCQkGBgz2Bg
@@ -443,7 +443,7 @@ DKIqP4kxREIJAzKQwQ5muYNVstJ7aSRh5lj4Sjk2R3HALMEUmIZLpxXtaDQkptPuGLUYUE1Yh8Oa
 3LjmuO09U2zS3OPc0KY3tt3MbZSAW+oKQTe7AVNn3YwcOY0GOMUNjhKM5Nw4/XY6xTEOUI67nDo9
 RznLYS5zm9vn55wnutDdznTnnOfqDtC6gmIAdsCT3UFrN9HcFYJ718PR74JHOuLFUHrIm5LySNi8
 59EOpNRL3vIyWoDssWd7yitmIQIBADs="""),
-'sebsauvage.net':Tkinter.PhotoImage(master=self.top,data="""
+'sebsauvage.net':tkinter.PhotoImage(master=self.top,data="""
 R0lGODlhVQBVAPcAAP///8zMzP///wAAACKUABF0ABqEAAliADIyMiulAB6MADO0AMbExRZ8AA5t
 AEjeADCtADi+ADvFACeeAL6+vkPVAEDOAJycnEzmAMS1vAZcAAxpAFpaWra2tkpKSr2ir62trTk5
 OcCrtlHvAARYAObm5oODg3x8fLygrouLi2pqahR5AKSkpMjAxANTAHR1dEFBQWNjYyWaAMrHyfT0
@@ -604,8 +604,8 @@ FxAAOw==""")
         
      
         
-        boldFont = tkFont.Font(weight='bold',size=-11)  # A simple bold font.
-        smallFont = tkFont.Font(size=-9)  # A smaller font (for blacklists)
+        boldFont = tkinter.font.Font(weight='bold',size=-11)  # A simple bold font.
+        smallFont = tkinter.font.Font(size=-9)  # A smaller font (for blacklists)
         
         defaultPadding = 5   # Padding around some widgets.
         
@@ -633,7 +633,7 @@ FxAAOw==""")
         #helpFrame.grid(column=0,row=1,sticky='NSWE')
         
         # row 2 - Buttons (Save/Default/Cancel)
-        buttonsframe = Tkinter.Frame(self.top,borderwidth=5 )
+        buttonsframe = tkinter.Frame(self.top,borderwidth=5 )
         buttonsframe.grid(column=0,row=2,sticky='NSWE')
 
         
@@ -650,10 +650,10 @@ FxAAOw==""")
         # ----------------------------------------------------------------------
         # Buttons (Save/Default/Cancel):
         # FIXME: Use Pmw.ButtonBox() instead ?
-        Tkinter.Button(buttonsframe,text="Save configuration",command=self.saveClick).grid(column=0,row=0)
-        Tkinter.Button(buttonsframe,text="Load configuration",command=self.loadClick).grid(column=1,row=0)
-        Tkinter.Button(buttonsframe,text="Get default values",command=self.defaultClick).grid(column=2,row=0)
-        Tkinter.Button(buttonsframe,text="Close",command=self.exitClick).grid(column=3,row=0)
+        tkinter.Button(buttonsframe,text="Save configuration",command=self.saveClick).grid(column=0,row=0)
+        tkinter.Button(buttonsframe,text="Load configuration",command=self.loadClick).grid(column=1,row=0)
+        tkinter.Button(buttonsframe,text="Get default values",command=self.defaultClick).grid(column=2,row=0)
+        tkinter.Button(buttonsframe,text="Close",command=self.exitClick).grid(column=3,row=0)
         
         # ======================================================================
         # Note book tab "Image generation"
@@ -666,7 +666,7 @@ FxAAOw==""")
         #     44 66      66=Debug
         
         # Cell 0 - "If you're unsure of the options to change, you can leave the default values."
-        Tkinter.Label(nbook.page(0),text="If you're unsure of the options to change, you can leave the default values.",
+        tkinter.Label(nbook.page(0),text="If you're unsure of the options to change, you can leave the default values.",
                 font=boldFont).grid(column=0,row=0,columnspan=2)
         
         # Cell 1 - Image resolution
@@ -699,44 +699,44 @@ FxAAOw==""")
         #    II  LLLLLLL    LLL = "Note: Resolution will be ignored by the Windows screensaver..."
         #                   III = icon
         #                  
-        Tkinter.Label(resolutionFrame.interior(),image=self._ICONS['imagesize'],width=80).grid(column=0,row=0,rowspan=2,sticky='w')
-        tempFrame = Tkinter.Frame(resolutionFrame.interior())
+        tkinter.Label(resolutionFrame.interior(),image=self._ICONS['imagesize'],width=80).grid(column=0,row=0,rowspan=2,sticky='w')
+        tempFrame = tkinter.Frame(resolutionFrame.interior())
         tempFrame.grid(column=1,row=0)
-        Tkinter.Label(resolutionFrame.interior(),text="Note: Resolution will be ignored by the Windows screensaver.\n(It will automatically detect screen resolution.)",justify='left').grid(column=1,row=1)
+        tkinter.Label(resolutionFrame.interior(),text="Note: Resolution will be ignored by the Windows screensaver.\n(It will automatically detect screen resolution.)",justify='left').grid(column=1,row=1)
 
         # The frame FFFFFFF containing the cursors:
         self._widgets['assembler.sizex'] = Pmw.Counter(tempFrame,datatype={'counter':'numeric'},entryfield_value='1024',entry_width=6)
         self._widgets['assembler.sizex'].grid(column=0,row=0)
-        Tkinter.Label(tempFrame,text=" by ").grid(column=1,row=0)
+        tkinter.Label(tempFrame,text=" by ").grid(column=1,row=0)
         self._widgets['assembler.sizey'] = Pmw.Counter(tempFrame,datatype={'counter':'numeric'},entryfield_value='768',entry_width=6)
         self._widgets['assembler.sizey'].grid(column=2,row=0)
-        Tkinter.Label(tempFrame,text="Width").grid(column=0,row=1)
-        Tkinter.Label(tempFrame,text="Height").grid(column=2,row=1)
+        tkinter.Label(tempFrame,text="Width").grid(column=0,row=1)
+        tkinter.Label(tempFrame,text="Height").grid(column=2,row=1)
 
         # ----------------------------------------------------------------------        
         # Cell 2 content : Frequency
-        Tkinter.Label(timeFrame.interior(),text="Evolve current image every").grid(column=1,row=0,sticky='e')
+        tkinter.Label(timeFrame.interior(),text="Evolve current image every").grid(column=1,row=0,sticky='e')
         # FIXME: How do I right justify this ?  (label_justify does not exist !)
         self._widgets['program.every'] = Pmw.Counter(timeFrame.interior(),datatype={'counter':'numeric'},entryfield_value='60',entry_width=4)
         self._widgets['program.every'].grid(column=2,row=0)
-        Tkinter.Label(timeFrame.interior(),text="seconds").grid(column=3,row=0,sticky='w')
+        tkinter.Label(timeFrame.interior(),text="seconds").grid(column=3,row=0,sticky='w')
 
-        Tkinter.Label(timeFrame.interior(),text="by adding").grid(column=1,row=1,sticky='e')
+        tkinter.Label(timeFrame.interior(),text="by adding").grid(column=1,row=1,sticky='e')
         self._widgets['assembler.superpose.nbimages'] = Pmw.Counter(timeFrame.interior(),datatype={'counter':'numeric'},entryfield_value='10',entry_width=4)
         self._widgets['assembler.superpose.nbimages'].grid(column=2,row=1)
-        Tkinter.Label(timeFrame.interior(),text="random images from the internet").grid(column=3,row=1,sticky='w')
+        tkinter.Label(timeFrame.interior(),text="random images from the internet").grid(column=3,row=1,sticky='w')
         
-        Tkinter.Label(timeFrame.interior(),image=self._ICONS['frequency'],width=80).grid(column=0,row=0,rowspan=3,sticky='w')
+        tkinter.Label(timeFrame.interior(),image=self._ICONS['frequency'],width=80).grid(column=0,row=0,rowspan=3,sticky='w')
         
         # ----------------------------------------------------------------------        
         # Cell 3 content : Keyword image search
-        v = Tkinter.IntVar(); self._widgets['collector.keywords.enabled'] = v
-        Tkinter.Radiobutton(keywordFrame.interior(),variable=v,value=0,command=self._enablerDisabler,text="Use totally random images (default)").grid(column=0,row=0,sticky='W')
-        Tkinter.Radiobutton(keywordFrame.interior(),variable=v,value=1,command=self._enablerDisabler,text="Search images using the following keywords:").grid(column=0,row=1,sticky='W')
+        v = tkinter.IntVar(); self._widgets['collector.keywords.enabled'] = v
+        tkinter.Radiobutton(keywordFrame.interior(),variable=v,value=0,command=self._enablerDisabler,text="Use totally random images (default)").grid(column=0,row=0,sticky='W')
+        tkinter.Radiobutton(keywordFrame.interior(),variable=v,value=1,command=self._enablerDisabler,text="Search images using the following keywords:").grid(column=0,row=1,sticky='W')
         v.set(0)
 
-        s = Tkinter.StringVar(); self._widgets['collector.keywords.keywords'] = s
-        widget = Tkinter.Entry(keywordFrame.interior(),width=40,textvariable=s)
+        s = tkinter.StringVar(); self._widgets['collector.keywords.keywords'] = s
+        widget = tkinter.Entry(keywordFrame.interior(),width=40,textvariable=s)
         widget.grid(column=1,row=1,sticky='EW')
         self._widgets_group['collector.keywords.keywords'] = [widget]  # Store reference to this widget so that we can enable/disable it later.
         
@@ -744,56 +744,56 @@ FxAAOw==""")
         
         # ----------------------------------------------------------------------        
         # Cell 4 content: Output options
-        v = Tkinter.IntVar(); self._widgets['assembler.superpose.randomrotation']=v
-        self._widgets['RotationCheckbutton'] = Tkinter.Checkbutton(optionsGroup.interior(),variable=v,image=self._ICONS['rotation'],command=self._imageChanger)
+        v = tkinter.IntVar(); self._widgets['assembler.superpose.randomrotation']=v
+        self._widgets['RotationCheckbutton'] = tkinter.Checkbutton(optionsGroup.interior(),variable=v,image=self._ICONS['rotation'],command=self._imageChanger)
         self._widgets['RotationCheckbutton'].grid(column=0,row=0,sticky='W')
-        Tkinter.Label(optionsGroup.interior(),text="Random rotation").grid(column=1,row=0,sticky='W')
+        tkinter.Label(optionsGroup.interior(),text="Random rotation").grid(column=1,row=0,sticky='W')
         
-        v = Tkinter.IntVar(); self._widgets['assembler.mirror']=v
-        self._widgets['MirrorCheckbutton'] = Tkinter.Checkbutton(optionsGroup.interior(),variable=v,image=self._ICONS['mirror'],command=self._imageChanger)
+        v = tkinter.IntVar(); self._widgets['assembler.mirror']=v
+        self._widgets['MirrorCheckbutton'] = tkinter.Checkbutton(optionsGroup.interior(),variable=v,image=self._ICONS['mirror'],command=self._imageChanger)
         self._widgets['MirrorCheckbutton'].grid(column=0,row=1,sticky='W')
-        Tkinter.Label(optionsGroup.interior(),text="Mirror (left-right)").grid(column=1,row=1,sticky='W')
+        tkinter.Label(optionsGroup.interior(),text="Mirror (left-right)").grid(column=1,row=1,sticky='W')
         
-        v = Tkinter.IntVar(); self._widgets['assembler.invert']=v
-        self._widgets['InvertCheckbutton'] = Tkinter.Checkbutton(optionsGroup.interior(),variable=v,image=self._ICONS['invert'],command=self._imageChanger)
+        v = tkinter.IntVar(); self._widgets['assembler.invert']=v
+        self._widgets['InvertCheckbutton'] = tkinter.Checkbutton(optionsGroup.interior(),variable=v,image=self._ICONS['invert'],command=self._imageChanger)
         self._widgets['InvertCheckbutton'].grid(column=0,row=2,sticky='W')
-        Tkinter.Label(optionsGroup.interior(),text="Invert (negative)").grid(column=1,row=2,sticky='W')
+        tkinter.Label(optionsGroup.interior(),text="Invert (negative)").grid(column=1,row=2,sticky='W')
         
-        v = Tkinter.IntVar(); self._widgets['assembler.emboss']=v
-        self._widgets['EmbossCheckbutton'] = Tkinter.Checkbutton(optionsGroup.interior(),variable=v,image=self._ICONS['emboss'],command=self._imageChanger)
+        v = tkinter.IntVar(); self._widgets['assembler.emboss']=v
+        self._widgets['EmbossCheckbutton'] = tkinter.Checkbutton(optionsGroup.interior(),variable=v,image=self._ICONS['emboss'],command=self._imageChanger)
         self._widgets['EmbossCheckbutton'].grid(column=0,row=3,sticky='W')
-        Tkinter.Label(optionsGroup.interior(),text="Emboss").grid(column=1,row=3,sticky='W')
+        tkinter.Label(optionsGroup.interior(),text="Emboss").grid(column=1,row=3,sticky='W')
         
-        v = Tkinter.IntVar(); self._widgets['assembler.resuperpose']=v
-        self._widgets['ResuperposeCheckbutton'] = Tkinter.Checkbutton(optionsGroup.interior(),variable=v,image=self._ICONS['resuperpose'],command=self._imageChanger)
+        v = tkinter.IntVar(); self._widgets['assembler.resuperpose']=v
+        self._widgets['ResuperposeCheckbutton'] = tkinter.Checkbutton(optionsGroup.interior(),variable=v,image=self._ICONS['resuperpose'],command=self._imageChanger)
         self._widgets['ResuperposeCheckbutton'].grid(column=0,row=4,sticky='W')
-        Tkinter.Label(optionsGroup.interior(),text="Re-superpose").grid(column=1,row=4,sticky='W')
+        tkinter.Label(optionsGroup.interior(),text="Re-superpose").grid(column=1,row=4,sticky='W')
         
         self._widgets['assembler.superpose.bordersmooth'] = Pmw.Counter(optionsGroup.interior(),datatype={'counter':'numeric'},entry_width=4,entryfield_value=30)
         self._widgets['assembler.superpose.bordersmooth'].grid(column=0,row=5,sticky='W')
-        Tkinter.Label(optionsGroup.interior(),text="pixels border smooth\n(0=no smooth)",anchor='w').grid(column=1,row=5,sticky='NW')
+        tkinter.Label(optionsGroup.interior(),text="pixels border smooth\n(0=no smooth)",anchor='w').grid(column=1,row=5,sticky='NW')
         
-        Tkinter.Label(optionsGroup.interior(),text="scale before superposing\n(1=no scale)",anchor='w').grid(column=1,row=6,sticky='NW')        
-        s = Tkinter.StringVar(); self._widgets['assembler.superpose.scale'] = s
-        Tkinter.Entry(optionsGroup.interior(),width=6,textvariable=s).grid(column=0,row=6,sticky='EW')
+        tkinter.Label(optionsGroup.interior(),text="scale before superposing\n(1=no scale)",anchor='w').grid(column=1,row=6,sticky='NW')        
+        s = tkinter.StringVar(); self._widgets['assembler.superpose.scale'] = s
+        tkinter.Entry(optionsGroup.interior(),width=6,textvariable=s).grid(column=0,row=6,sticky='EW')
         
         # ----------------------------------------------------------------------        
         # Cell 5 content: Variante
-        v = Tkinter.IntVar(); self._widgets['assembler.superpose.variante'] = v
-        Tkinter.Radiobutton(varianteGroup.interior(),variable=v,value=0,command=self._enablerDisabler,image=self._ICONS['variante0']).grid(column=0,row=0,sticky='W')
-        Tkinter.Radiobutton(varianteGroup.interior(),variable=v,value=1,command=self._enablerDisabler,image=self._ICONS['variante1']).grid(column=0,row=1,sticky='W')
+        v = tkinter.IntVar(); self._widgets['assembler.superpose.variante'] = v
+        tkinter.Radiobutton(varianteGroup.interior(),variable=v,value=0,command=self._enablerDisabler,image=self._ICONS['variante0']).grid(column=0,row=0,sticky='W')
+        tkinter.Radiobutton(varianteGroup.interior(),variable=v,value=1,command=self._enablerDisabler,image=self._ICONS['variante1']).grid(column=0,row=1,sticky='W')
         v.set(0)
-        Tkinter.Label(varianteGroup.interior(),text="0 (Superpose+Equalize)   [Recommended]").grid(column=1,row=0,sticky='w')
-        Tkinter.Label(varianteGroup.interior(),text="1 (Darken+Superpose+Autocontrast)").grid(column=1,row=1,sticky='w')
+        tkinter.Label(varianteGroup.interior(),text="0 (Superpose+Equalize)   [Recommended]").grid(column=1,row=0,sticky='w')
+        tkinter.Label(varianteGroup.interior(),text="1 (Darken+Superpose+Autocontrast)").grid(column=1,row=1,sticky='w')
         
         # ----------------------------------------------------------------------        
         # Cell 6 content: Debug
-        tempFrame= Tkinter.Frame(debugGroup.interior())
+        tempFrame= tkinter.Frame(debugGroup.interior())
         tempFrame.grid(column=0,row=0,sticky='W')
-        v = Tkinter.IntVar(); self._widgets['debug']=v
-        Tkinter.Checkbutton(tempFrame,image=self._ICONS['debug'],variable=v).grid(column=0,row=0,sticky='W')
-        Tkinter.Label(tempFrame,text="Debug mode").grid(column=1,row=0,sticky='W')
-        Tkinter.Label(debugGroup.interior(),text="(Debug mode will create webGobbler.log in the installation directory.)").grid(column=0,row=1,columnspan=2,sticky='w')
+        v = tkinter.IntVar(); self._widgets['debug']=v
+        tkinter.Checkbutton(tempFrame,image=self._ICONS['debug'],variable=v).grid(column=0,row=0,sticky='W')
+        tkinter.Label(tempFrame,text="Debug mode").grid(column=1,row=0,sticky='W')
+        tkinter.Label(debugGroup.interior(),text="(Debug mode will create webGobbler.log in the installation directory.)").grid(column=0,row=1,columnspan=2,sticky='w')
         
 
         # ======================================================================
@@ -807,30 +807,30 @@ FxAAOw==""")
         
         # ----------------------------------------------------------------------        
         # row 0 content: Downloaded images
-        Tkinter.Label(downloadedImagesGroup.interior(),image=self._ICONS['storage'],width=80).grid(column=0,row=0,rowspan=2,sticky='w')
+        tkinter.Label(downloadedImagesGroup.interior(),image=self._ICONS['storage'],width=80).grid(column=0,row=0,rowspan=2,sticky='w')
         
-        Tkinter.Label(downloadedImagesGroup.interior(),text="Store downloaded images in :").grid(column=1,row=0,columnspan=2,sticky='W')
-        s = Tkinter.StringVar(); self._widgets['pool.imagepooldirectory'] = s
-        Tkinter.Entry(downloadedImagesGroup.interior(),width=50,textvariable=s).grid(column=1,row=1,sticky='W')
-        Tkinter.Button(downloadedImagesGroup.interior(),text="Browse...",command=self.chooseImagepoolDirClick).grid(column=2,row=1,sticky='W')
-        Tkinter.Label(downloadedImagesGroup.interior(),text="(Directory will be created if it does not exist.)\n").grid(column=1,row=2,columnspan=2,sticky='W')
-        tempFrame = Tkinter.Frame(downloadedImagesGroup.interior())
+        tkinter.Label(downloadedImagesGroup.interior(),text="Store downloaded images in :").grid(column=1,row=0,columnspan=2,sticky='W')
+        s = tkinter.StringVar(); self._widgets['pool.imagepooldirectory'] = s
+        tkinter.Entry(downloadedImagesGroup.interior(),width=50,textvariable=s).grid(column=1,row=1,sticky='W')
+        tkinter.Button(downloadedImagesGroup.interior(),text="Browse...",command=self.chooseImagepoolDirClick).grid(column=2,row=1,sticky='W')
+        tkinter.Label(downloadedImagesGroup.interior(),text="(Directory will be created if it does not exist.)\n").grid(column=1,row=2,columnspan=2,sticky='W')
+        tempFrame = tkinter.Frame(downloadedImagesGroup.interior())
         tempFrame.grid(column=1,row=3,columnspan=2,sticky='W')       
-        Tkinter.Label(tempFrame,text="Keep").grid(column=0,row=0)
+        tkinter.Label(tempFrame,text="Keep").grid(column=0,row=0)
         
         self._widgets['pool.nbimages'] = Pmw.Counter(tempFrame,datatype={'counter':'numeric'},entry_width=4,entryfield_value=50)
         self._widgets['pool.nbimages'].grid(column=1,row=0)
-        Tkinter.Label(tempFrame,text="images in this directory.  (Recommended: 50)").grid(column=2,row=0)
+        tkinter.Label(tempFrame,text="images in this directory.  (Recommended: 50)").grid(column=2,row=0)
         
         
         # ----------------------------------------------------------------------        
         # row 1 content: Working directory
-        Tkinter.Label(workingDirGroup.interior(),image=self._ICONS['workingdir'],width=80).grid(column=0,row=0,rowspan=2,sticky='nw')
+        tkinter.Label(workingDirGroup.interior(),image=self._ICONS['workingdir'],width=80).grid(column=0,row=0,rowspan=2,sticky='nw')
         
-        Tkinter.Label(workingDirGroup.interior(),text="Store working files in :").grid(column=1,row=0,columnspan=2,sticky='W')
-        s = Tkinter.StringVar() ; self._widgets['persistencedirectory'] = s
-        Tkinter.Entry(workingDirGroup.interior(),width=50,textvariable=s).grid(column=1,row=1,sticky='W')
-        Tkinter.Button(workingDirGroup.interior(),text="Browse...",command=self.chooseWorkingDirClick).grid(column=2,row=1,sticky='W')
+        tkinter.Label(workingDirGroup.interior(),text="Store working files in :").grid(column=1,row=0,columnspan=2,sticky='W')
+        s = tkinter.StringVar() ; self._widgets['persistencedirectory'] = s
+        tkinter.Entry(workingDirGroup.interior(),width=50,textvariable=s).grid(column=1,row=1,sticky='W')
+        tkinter.Button(workingDirGroup.interior(),text="Browse...",command=self.chooseWorkingDirClick).grid(column=2,row=1,sticky='W')
         
         
         
@@ -848,77 +848,77 @@ FxAAOw==""")
         connectionGroup = Pmw.Group(nbook.page(2), tag_text='Connection')
         connectionGroup.grid(column=0,row=0,sticky='NSEW',padx=defaultPadding,pady=defaultPadding)
         
-        self._widgets['ConnectionImage'] = Tkinter.Label(connectionGroup.interior(),image=self._ICONS['connected'])
+        self._widgets['ConnectionImage'] = tkinter.Label(connectionGroup.interior(),image=self._ICONS['connected'])
         self._widgets['ConnectionImage'].grid(column=0,row=0,rowspan=5,sticky='n')
 
         # ----------------------------------------------------------------------        
         # row 0 content: radiobutton "Do not connect to internet"
-        v = Tkinter.IntVar() ; self._widgets['collector.localonly'] = v
-        Tkinter.Radiobutton(connectionGroup.interior(),variable=v,value=1,command=self._enablerDisabler,text="Do not connect to internet: use images found on local disk").grid(column=1,row=0,columnspan=2,sticky='W')
+        v = tkinter.IntVar() ; self._widgets['collector.localonly'] = v
+        tkinter.Radiobutton(connectionGroup.interior(),variable=v,value=1,command=self._enablerDisabler,text="Do not connect to internet: use images found on local disk").grid(column=1,row=0,columnspan=2,sticky='W')
         # Choose directory
         
-        s = Tkinter.StringVar() ; self._widgets['collector.localonly.startdir'] = s
-        localStartDirEntry = Tkinter.Entry(connectionGroup.interior(),width=30,textvariable=s)
+        s = tkinter.StringVar() ; self._widgets['collector.localonly.startdir'] = s
+        localStartDirEntry = tkinter.Entry(connectionGroup.interior(),width=30,textvariable=s)
         localStartDirEntry.grid(column=2,row=1,sticky='EW')
-        chooseLocalStartDirButton = Tkinter.Button(connectionGroup.interior(),text="Choose diretory...",command=self.chooseLocalStartDirectory)
+        chooseLocalStartDirButton = tkinter.Button(connectionGroup.interior(),text="Choose diretory...",command=self.chooseLocalStartDirectory)
         chooseLocalStartDirButton.grid(column=3,row=1,sticky='W')
         
         # ----------------------------------------------------------------------        
         # row 1 content: radiobutton "Use the internet"
-        Tkinter.Radiobutton(connectionGroup.interior(),variable=v,value=0,command=self._enablerDisabler,text="Use the internet :").grid(column=1,row=2,columnspan=3,sticky='W')
+        tkinter.Radiobutton(connectionGroup.interior(),variable=v,value=0,command=self._enablerDisabler,text="Use the internet :").grid(column=1,row=2,columnspan=3,sticky='W')
         v.set(0)
         # ----------------------------------------------------------------------        
         # row 2 content: group "Internet connexion parameters"   
         #     SSSS GGGG     SSSS = a space (Canvas)
         #                   GGGG = the "Internet connexion parameter" group.
         
-        Tkinter.Canvas(connectionGroup.interior(),width=20,height=10).grid(column=1,row=4)  # Just a spacer
+        tkinter.Canvas(connectionGroup.interior(),width=20,height=10).grid(column=1,row=4)  # Just a spacer
         connectionParamGroup = Pmw.Group(connectionGroup.interior(), tag_text='Internet connection parameters')
         connectionParamGroup.grid(column=2,row=4,columnspan=3,sticky='W',padx=defaultPadding,pady=defaultPadding)
         
         # "Internet connexion parameter" group content:
-        v = Tkinter.IntVar(); self._widgets['network.http.proxy.enabled'] = v
-        rbDirectConnection = Tkinter.Radiobutton(connectionParamGroup.interior(),variable=v,value=0,text="Direction connection",command=self._enablerDisabler)
+        v = tkinter.IntVar(); self._widgets['network.http.proxy.enabled'] = v
+        rbDirectConnection = tkinter.Radiobutton(connectionParamGroup.interior(),variable=v,value=0,text="Direction connection",command=self._enablerDisabler)
         rbDirectConnection.grid(column=0,row=0,sticky='W')
-        rbUseProxy = Tkinter.Radiobutton(connectionParamGroup.interior(),variable=v,value=1,text="Use HTTP Proxy :",command=self._enablerDisabler)
+        rbUseProxy = tkinter.Radiobutton(connectionParamGroup.interior(),variable=v,value=1,text="Use HTTP Proxy :",command=self._enablerDisabler)
         rbUseProxy.grid(column=0,row=1,sticky='NW')        
         v.set(0)
-        proxyParamsFrame = Tkinter.Frame(connectionParamGroup.interior())
+        proxyParamsFrame = tkinter.Frame(connectionParamGroup.interior())
         proxyParamsFrame.grid(column=1,row=1)
         self._widgets['proxyParamsFrame'] = proxyParamsFrame
         
         # Proxy parameters:
-        Tkinter.Label(proxyParamsFrame,text="Proxy address").grid(column=0,row=0,sticky='W')
-        Tkinter.Label(proxyParamsFrame,text="Port").grid(column=1,row=0,sticky='W')
+        tkinter.Label(proxyParamsFrame,text="Proxy address").grid(column=0,row=0,sticky='W')
+        tkinter.Label(proxyParamsFrame,text="Port").grid(column=1,row=0,sticky='W')
         
-        s = Tkinter.StringVar(); self._widgets['network.http.proxy.address'] = s
-        proxyAddressEntry = Tkinter.Entry(proxyParamsFrame,width=30,textvariable=s)
+        s = tkinter.StringVar(); self._widgets['network.http.proxy.address'] = s
+        proxyAddressEntry = tkinter.Entry(proxyParamsFrame,width=30,textvariable=s)
         proxyAddressEntry.grid(column=0,row=1,sticky='EW')
         
-        s = Tkinter.StringVar(); self._widgets['network.http.proxy.port'] = s
-        proxyPortEntry = Tkinter.Entry(proxyParamsFrame,width=6,textvariable=s)
+        s = tkinter.StringVar(); self._widgets['network.http.proxy.port'] = s
+        proxyPortEntry = tkinter.Entry(proxyParamsFrame,width=6,textvariable=s)
         proxyPortEntry.grid(column=1,row=1,sticky='EW')
         
-        v = Tkinter.IntVar(); self._widgets['network.http.proxy.auth.enabled'] = v
-        proxyUseAuthCheckbox = Tkinter.Checkbutton(proxyParamsFrame,text="Proxy requires authentication",variable=v,command=self._enablerDisabler)
+        v = tkinter.IntVar(); self._widgets['network.http.proxy.auth.enabled'] = v
+        proxyUseAuthCheckbox = tkinter.Checkbutton(proxyParamsFrame,text="Proxy requires authentication",variable=v,command=self._enablerDisabler)
         proxyUseAuthCheckbox.grid(column=0,row=2,columnspan=2,sticky='W')
         
-        proxyAuthFrame = Tkinter.Frame(proxyParamsFrame,width=50)
+        proxyAuthFrame = tkinter.Frame(proxyParamsFrame,width=50)
         self._widgets['proxyAuthFrame'] = proxyAuthFrame
         #proxyAuthFrame.grid_propagate(0)
         proxyAuthFrame.grid(column=0,row=3,columnspan=2,stick='E')
         
         # Proxy authentication frame:
-        Tkinter.Canvas(proxyAuthFrame,width=20,height=10).grid(column=0,row=0,rowspan=3)  # Just a spacer
-        Tkinter.Label(proxyAuthFrame,text="Login :").grid(column=1,row=1,sticky='W')
-        s = Tkinter.StringVar(); self._widgets['network.http.proxy.auth.login'] = s
-        loginEntry = Tkinter.Entry(proxyAuthFrame,width=15,textvariable=s)
+        tkinter.Canvas(proxyAuthFrame,width=20,height=10).grid(column=0,row=0,rowspan=3)  # Just a spacer
+        tkinter.Label(proxyAuthFrame,text="Login :").grid(column=1,row=1,sticky='W')
+        s = tkinter.StringVar(); self._widgets['network.http.proxy.auth.login'] = s
+        loginEntry = tkinter.Entry(proxyAuthFrame,width=15,textvariable=s)
         loginEntry.grid(column=2,row=1,sticky='EW')
-        Tkinter.Label(proxyAuthFrame,text="Password :").grid(column=1,row=2,sticky='W')
-        s = Tkinter.StringVar(); self._widgets['network.http.proxy.auth.password'] = s
-        passwordEntry = Tkinter.Entry(proxyAuthFrame,width=15,textvariable=s,show='*')
+        tkinter.Label(proxyAuthFrame,text="Password :").grid(column=1,row=2,sticky='W')
+        s = tkinter.StringVar(); self._widgets['network.http.proxy.auth.password'] = s
+        passwordEntry = tkinter.Entry(proxyAuthFrame,width=15,textvariable=s,show='*')
         passwordEntry.grid(column=2,row=2,sticky='EW')
-        Tkinter.Label(proxyAuthFrame,text="(WARNING: Password is stored in registry)").grid(column=2,row=3)
+        tkinter.Label(proxyAuthFrame,text="(WARNING: Password is stored in registry)").grid(column=2,row=3)
 
         # List of widgets to disable according to selected options:
         self._widgets_group['network.http.proxy.auth.enabled'] = ( loginEntry,passwordEntry )
@@ -938,7 +938,7 @@ FxAAOw==""")
         # Blacklisted images:
         self._widgets['blacklist.imagesha1'] = Pmw.ScrolledText(blacklistedImagesGroup.interior(),text_width=42,text_height=30,text_wrap='none',vscrollmode='static',text_font=smallFont)
         self._widgets['blacklist.imagesha1'].grid(column=0,row=0)
-        Tkinter.Button(blacklistedImagesGroup.interior(),text="Add image...",command=self.addImageBlacklist).grid(column=0,row=1)
+        tkinter.Button(blacklistedImagesGroup.interior(),text="Add image...",command=self.addImageBlacklist).grid(column=0,row=1)
         
         # Blacklisted URLs
         self._widgets['blacklist.url'] = Pmw.ScrolledText(blacklistedURLsGroup.interior(),text_width=42,text_height=30,text_wrap='none',vscrollmode='static',text_font=smallFont)
@@ -1054,7 +1054,7 @@ and uses the following libraries and programs:
                 
         # For the "Blacklists" tab
         self._widgets['blacklist.imagesha1'].delete('1.0', 'end')
-        self._widgets['blacklist.imagesha1'].insert('0.0','\n'.join(c['blacklist.imagesha1'].keys()))
+        self._widgets['blacklist.imagesha1'].insert('0.0','\n'.join(list(c['blacklist.imagesha1'].keys())))
 
         self._widgets['blacklist.url'].delete('1.0', 'end')
         self._widgets['blacklist.url'].insert('0.0','\n'.join(c['blacklist.url']))
@@ -1126,7 +1126,7 @@ and uses the following libraries and programs:
             some of these widgets.
         '''    
         # First enable all widgets, then de-activate them according to selected options.
-        for group in self._widgets_group.values():
+        for group in list(self._widgets_group.values()):
             for widget in group:
                 widget.configure(state='normal')
         
@@ -1225,18 +1225,18 @@ and uses the following libraries and programs:
 
     def chooseImagepoolDirClick(self):
         initialDir = self._widgets['pool.imagepooldirectory'].get()
-        newDir = tkFileDialog.askdirectory(parent=self,initialdir=initialDir,title='Select a directory where to store downloaded images...').strip()
+        newDir = tkinter.filedialog.askdirectory(parent=self,initialdir=initialDir,title='Select a directory where to store downloaded images...').strip()
         if len(newDir) > 0:
             self._widgets['pool.imagepooldirectory'].set( newDir )
 
     def chooseWorkingDirClick(self):
         initialDir = self._widgets['persistencedirectory'].get()
-        newDir = tkFileDialog.askdirectory(parent=self,initialdir=initialDir,title='Select a directory where to store working files...').strip()
+        newDir = tkinter.filedialog.askdirectory(parent=self,initialdir=initialDir,title='Select a directory where to store working files...').strip()
         if len(newDir) > 0:
             self._widgets['persistencedirectory'].set( newDir )
     
     def addImageBlacklist(self):
-        file = tkFileDialog.askopenfile(parent=self,mode='rb',title='Select a file to add to the blacklist...')
+        file = tkinter.filedialog.askopenfile(parent=self,mode='rb',title='Select a file to add to the blacklist...')
         if file == None:
             return
         data = file.read(10000000)  # Read at most 10 Mb
@@ -1245,7 +1245,7 @@ and uses the following libraries and programs:
 
     def chooseLocalStartDirectory(self):
         initialDir = self._widgets['collector.localonly.startdir'].get()
-        newDir = tkFileDialog.askdirectory(parent=self,initialdir=initialDir,title='Select a directory where to get images from...').strip()
+        newDir = tkinter.filedialog.askdirectory(parent=self,initialdir=initialDir,title='Select a directory where to get images from...').strip()
         if len(newDir) > 0:
             self._widgets['collector.localonly.startdir'].set( newDir )
     

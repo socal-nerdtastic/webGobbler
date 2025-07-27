@@ -7,8 +7,8 @@ webGobbler application 1.2.8
 
 try:
     import Pmw
-except ImportError, exc:
-    raise ImportError, "The Pmw (Python Megawidgets) module is required for the webGobbler application. See http://pmw.sourceforge.net/\nCould not import module because: %s" % exc
+except ImportError as exc:
+    raise ImportError("The Pmw (Python Megawidgets) module is required for the webGobbler application. See http://pmw.sourceforge.net/\nCould not import module because: %s" % exc)
 
 import sys,os,os.path
 
@@ -17,20 +17,20 @@ if os.path.isdir('libtcltk84'):
     os.environ['TK_LIBRARY'] =  'libtcltk84\\tk8.4'
 
 import time
-import Tkinter
-import tkFileDialog
-import tkFont
-import threading,Queue
+import tkinter
+import tkinter.filedialog
+import tkinter.font
+import threading,queue
 
 try:
     import webgobbler   # We import the webGobbler module.
-except ImportError, exc:
-    raise ImportError, "The webGobbler module is required to run this webGobbler configuration GUI. See http://sebsauvage.net/python/webgobbler/\nCould not import module because: %s" % exc
+except ImportError as exc:
+    raise ImportError("The webGobbler module is required to run this webGobbler configuration GUI. See http://sebsauvage.net/python/webgobbler/\nCould not import module because: %s" % exc)
 
 try:
   import ImageTk
-except ImportError, exc:
-  raise ImportError, "The PIL (Python Imaging Library) is required to run this program. See http://www.pythonware.com/products/pil/\nUnder Linux, install the packages pythonX.X-imaging and pythonX.X-imaging-tk.\nCould not import module because: %s" % exc 
+except ImportError as exc:
+  raise ImportError("The PIL (Python Imaging Library) is required to run this program. See http://www.pythonware.com/products/pil/\nUnder Linux, install the packages pythonX.X-imaging and pythonX.X-imaging-tk.\nCould not import module because: %s" % exc) 
 
 CTYPES_AVAILABLE = True
 try:
@@ -141,7 +141,7 @@ class wg_application:
         # Now put status "Stop" in all collectors we could not get status from.
         # (If they are not present in the assembler's pool, it means they
         # are de-activated)
-        for (collectorName,visited) in visitedCollectors.items():
+        for (collectorName,visited) in list(visitedCollectors.items()):
             if not visited:
                 self._setCollectorStatus(collectorName,'Off','')
         
@@ -253,14 +253,14 @@ class wg_application:
     def _initializeGUI(self):
         ''' This method creates all the GUI widgets. '''
 
-        smallFont = tkFont.Font(size=-11) 
-        smallFontBold = tkFont.Font(size=-11,weight='bold') 
+        smallFont = tkinter.font.Font(size=-11) 
+        smallFontBold = tkinter.font.Font(size=-11,weight='bold') 
                 
         # ======================================================================
         # Create the menu        
-        mainmenu = Tkinter.Menu(self._parent)
+        mainmenu = tkinter.Menu(self._parent)
         self._parent.config(menu=mainmenu)        
-        filemenu = Tkinter.Menu(mainmenu)
+        filemenu = tkinter.Menu(mainmenu)
         mainmenu.add_cascade(label="File", menu=filemenu)
         filemenu.add_command(label="Start new image from scratch",command=self.handlerStartNewImage)
         filemenu.add_command(label="Update current image now",command=self.handlerGenerateNow)
@@ -269,11 +269,11 @@ class wg_application:
         filemenu.add_separator()
         filemenu.add_command(label="Exit",command=self.handlerExit)
         
-        optionsMenu = Tkinter.Menu(mainmenu)
+        optionsMenu = tkinter.Menu(mainmenu)
         mainmenu.add_cascade(label="Options", menu=optionsMenu)
         optionsMenu.add_command(label="Configure...", command=self.handlerConfigure)
         
-        v = Tkinter.IntVar()
+        v = tkinter.IntVar()
         self.setAsWallpaper = v
         
         if sys.platform=="win32" and CTYPES_AVAILABLE:
@@ -282,64 +282,64 @@ class wg_application:
             cb = optionsMenu.add_checkbutton(label='Set as wallpaper',variable=v,command=self.handlerSetAsWallpaper)
         # FIXME: Implement this option for Gnome and KDE.
                 
-        helpmenu = Tkinter.Menu(mainmenu)
+        helpmenu = tkinter.Menu(mainmenu)
         mainmenu.add_cascade(label="Help", menu=helpmenu)
         helpmenu.add_command(label="About...", command=self.handlerAbout)
         
         
         # ======================================================================
         # The buttons area (Save, Update now, etc.)
-        self.buttonsArea = Tkinter.Frame(self._parent)
+        self.buttonsArea = tkinter.Frame(self._parent)
         self.buttonsArea.grid(column=1,row=0,sticky='ewn',padx=3)
         
-        self.saveButton = Tkinter.Button(self.buttonsArea,text="Save\nimage",command=self.handlerSaveAsForButton)
+        self.saveButton = tkinter.Button(self.buttonsArea,text="Save\nimage",command=self.handlerSaveAsForButton)
         self.saveButton.grid(column=0,row=0,sticky='EW',padx=3)
         
-        v = Tkinter.IntVar(); self._widgets['autosave.value'] = v
-        self._widgets['autosave.checkbox'] = Tkinter.Checkbutton(self.buttonsArea,variable=v,text="Auto-save")
+        v = tkinter.IntVar(); self._widgets['autosave.value'] = v
+        self._widgets['autosave.checkbox'] = tkinter.Checkbutton(self.buttonsArea,variable=v,text="Auto-save")
         self._widgets['autosave.checkbox'].grid(column=0,row=1,sticky='W',padx=3)       
         
-        self._widgets['updateimage.button'] = Tkinter.Button(self.buttonsArea,text="Update\nimage",command=self.handlerGenerateNow)
+        self._widgets['updateimage.button'] = tkinter.Button(self.buttonsArea,text="Update\nimage",command=self.handlerGenerateNow)
         self._widgets['updateimage.button'].grid(column=0,row=2,sticky='EWS',padx=3,pady=20)
         
         # ======================================================================
         # The status bar
-        self.statusFrame = Tkinter.Frame(self._parent)
+        self.statusFrame = tkinter.Frame(self._parent)
         #self.statusFrame.pack(side='top',fill='x',expand=1)      
         self.statusFrame.grid(column=0,row=0,sticky='ew')
         
         # The Google status:
-        Tkinter.Label(self.statusFrame,text='Google',anchor='w',bd=1,relief='sunken',font=smallFontBold).grid(column=0,row=0,sticky='ew')
-        self.googleStatus = Tkinter.Label(self.statusFrame,text="Off",anchor='w',bd=1,relief='sunken',font=smallFont);  self.googleStatus.grid(column=1,row=0,sticky='ew')
-        self.googleInfo = Tkinter.Label(self.statusFrame,text="",anchor='w',bd=1,relief='sunken',font=smallFont); self.googleInfo.grid(column=2,row=0,sticky='ew')
+        tkinter.Label(self.statusFrame,text='Google',anchor='w',bd=1,relief='sunken',font=smallFontBold).grid(column=0,row=0,sticky='ew')
+        self.googleStatus = tkinter.Label(self.statusFrame,text="Off",anchor='w',bd=1,relief='sunken',font=smallFont);  self.googleStatus.grid(column=1,row=0,sticky='ew')
+        self.googleInfo = tkinter.Label(self.statusFrame,text="",anchor='w',bd=1,relief='sunken',font=smallFont); self.googleInfo.grid(column=2,row=0,sticky='ew')
         
         # The Yahoo status:
-        Tkinter.Label(self.statusFrame,text='Yahoo',anchor='w',bd=1,relief='sunken',font=smallFontBold).grid(column=0,row=1,sticky='ew')
-        self.yahooStatus = Tkinter.Label(self.statusFrame,text="Off",anchor='w',bd=1,relief='sunken',font=smallFont); self.yahooStatus.grid(column=1,row=1,sticky='ew')
-        self.yahooInfo = Tkinter.Label(self.statusFrame,text="",anchor='w',bd=1,relief='sunken',font=smallFont); self.yahooInfo.grid(column=2,row=1,sticky='ew')
+        tkinter.Label(self.statusFrame,text='Yahoo',anchor='w',bd=1,relief='sunken',font=smallFontBold).grid(column=0,row=1,sticky='ew')
+        self.yahooStatus = tkinter.Label(self.statusFrame,text="Off",anchor='w',bd=1,relief='sunken',font=smallFont); self.yahooStatus.grid(column=1,row=1,sticky='ew')
+        self.yahooInfo = tkinter.Label(self.statusFrame,text="",anchor='w',bd=1,relief='sunken',font=smallFont); self.yahooInfo.grid(column=2,row=1,sticky='ew')
 
         # The Flickr status:
-        Tkinter.Label(self.statusFrame,text='Flickr',anchor='w',bd=1,relief='sunken',font=smallFontBold).grid(column=0,row=3,sticky='ew')
-        self.flickrStatus = Tkinter.Label(self.statusFrame,text="Off",anchor='w',bd=1,relief='sunken',font=smallFont); self.flickrStatus.grid(column=1,row=3,sticky='ew')
-        self.flickrInfo = Tkinter.Label(self.statusFrame,text="",anchor='w',bd=1,relief='sunken',font=smallFont); self.flickrInfo.grid(column=2,row=3,sticky='ew')
+        tkinter.Label(self.statusFrame,text='Flickr',anchor='w',bd=1,relief='sunken',font=smallFontBold).grid(column=0,row=3,sticky='ew')
+        self.flickrStatus = tkinter.Label(self.statusFrame,text="Off",anchor='w',bd=1,relief='sunken',font=smallFont); self.flickrStatus.grid(column=1,row=3,sticky='ew')
+        self.flickrInfo = tkinter.Label(self.statusFrame,text="",anchor='w',bd=1,relief='sunken',font=smallFont); self.flickrInfo.grid(column=2,row=3,sticky='ew')
         
         # The DeviantArt status:
-        Tkinter.Label(self.statusFrame,text='DeviantArt',anchor='w',bd=1,relief='sunken',font=smallFontBold).grid(column=0,row=4,sticky='ew')
-        self.deviantArtStatus = Tkinter.Label(self.statusFrame,text="Off",anchor='w',bd=1,relief='sunken',font=smallFont); self.deviantArtStatus.grid(column=1,row=4,sticky='ew')
-        self.deviantArtInfo = Tkinter.Label(self.statusFrame,text="",anchor='w',bd=1,relief='sunken',font=smallFont); self.deviantArtInfo.grid(column=2,row=4,sticky='ew')
+        tkinter.Label(self.statusFrame,text='DeviantArt',anchor='w',bd=1,relief='sunken',font=smallFontBold).grid(column=0,row=4,sticky='ew')
+        self.deviantArtStatus = tkinter.Label(self.statusFrame,text="Off",anchor='w',bd=1,relief='sunken',font=smallFont); self.deviantArtStatus.grid(column=1,row=4,sticky='ew')
+        self.deviantArtInfo = tkinter.Label(self.statusFrame,text="",anchor='w',bd=1,relief='sunken',font=smallFont); self.deviantArtInfo.grid(column=2,row=4,sticky='ew')
 
         # The local disk status:
-        Tkinter.Label(self.statusFrame,text='Local disk',anchor='w',bd=1,relief='sunken',font=smallFontBold).grid(column=0,row=5,sticky='ew')
-        self.localdiskStatus = Tkinter.Label(self.statusFrame,text="Off",anchor='w',bd=1,relief='sunken',font=smallFont); self.localdiskStatus.grid(column=1,row=5,sticky='ew')
-        self.localdiskInfo = Tkinter.Label(self.statusFrame,text="",anchor='w',bd=1,relief='sunken',font=smallFont); self.localdiskInfo.grid(column=2,row=5,sticky='ew')
+        tkinter.Label(self.statusFrame,text='Local disk',anchor='w',bd=1,relief='sunken',font=smallFontBold).grid(column=0,row=5,sticky='ew')
+        self.localdiskStatus = tkinter.Label(self.statusFrame,text="Off",anchor='w',bd=1,relief='sunken',font=smallFont); self.localdiskStatus.grid(column=1,row=5,sticky='ew')
+        self.localdiskInfo = tkinter.Label(self.statusFrame,text="",anchor='w',bd=1,relief='sunken',font=smallFont); self.localdiskInfo.grid(column=2,row=5,sticky='ew')
         
         # The pool state:
-        Tkinter.Label(self.statusFrame,text='Number of images in pool:',anchor='w',bd=1,relief='sunken',font=smallFontBold).grid(column=0,row=6,sticky='ew',columnspan=2)
-        self.poolSize = Tkinter.Label(self.statusFrame,text="",anchor='w',bd=1,relief='sunken',font=smallFont); self.poolSize.grid(column=2,row=6,sticky='ew')
+        tkinter.Label(self.statusFrame,text='Number of images in pool:',anchor='w',bd=1,relief='sunken',font=smallFontBold).grid(column=0,row=6,sticky='ew',columnspan=2)
+        self.poolSize = tkinter.Label(self.statusFrame,text="",anchor='w',bd=1,relief='sunken',font=smallFont); self.poolSize.grid(column=2,row=6,sticky='ew')
 
         # The image assembler state:
-        Tkinter.Label(self.statusFrame,text='Image assembler:',anchor='w',bd=1,relief='sunken',font=smallFontBold).grid(column=0,row=7,sticky='ew',columnspan=2)
-        self.assemblerState = Tkinter.Label(self.statusFrame,text="Waiting",anchor='w',bd=1,relief='sunken',font=smallFont); self.assemblerState.grid(column=2,row=7,sticky='ew')
+        tkinter.Label(self.statusFrame,text='Image assembler:',anchor='w',bd=1,relief='sunken',font=smallFontBold).grid(column=0,row=7,sticky='ew',columnspan=2)
+        self.assemblerState = tkinter.Label(self.statusFrame,text="Waiting",anchor='w',bd=1,relief='sunken',font=smallFont); self.assemblerState.grid(column=2,row=7,sticky='ew')
         
         
         # Allow the information columns to expand
@@ -351,14 +351,14 @@ class wg_application:
         # The scrollable frame which contains the image:
         sf = Pmw.ScrolledFrame(self._parent)
         sf.grid(column=0,row=1,stick='news',columnspan=2)
-        self.imageLabel = Tkinter.Label(sf.interior())  # This widget will hold the image.
+        self.imageLabel = tkinter.Label(sf.interior())  # This widget will hold the image.
         self.imageLabel.pack(fill='both', expand=1)
         
         # ======================================================================
         # The status bar.
-        statusFrame = Tkinter.Frame(self._parent,bd=1,relief='sunken')
+        statusFrame = tkinter.Frame(self._parent,bd=1,relief='sunken')
         statusFrame.grid(column=0,row=2,sticky='ew',columnspan=2)
-        self.statusLabel = Tkinter.Label(statusFrame,text="",anchor='w',font=smallFont)
+        self.statusLabel = tkinter.Label(statusFrame,text="",anchor='w',font=smallFont)
         self.statusLabel.grid(column=0,row=0,sticky='w')
         statusFrame.grid_columnconfigure(0,weight=1)
         
@@ -435,14 +435,14 @@ class wg_application:
 
     def handlerSaveAs(self):
         # Praise tkFileDialog !   This couldn't be easier.   :-)
-        saveAsName = tkFileDialog.asksaveasfilename(parent=self._parent,defaultextension='png',initialfile=time.strftime("%Y%m%d_%H%M%S"),filetypes=SAVE_FORMATS,title='Save image as...')
+        saveAsName = tkinter.filedialog.asksaveasfilename(parent=self._parent,defaultextension='png',initialfile=time.strftime("%Y%m%d_%H%M%S"),filetypes=SAVE_FORMATS,title='Save image as...')
         if len(saveAsName) > 0:
             self.setStatus("Saving image - Please wait...")
             self.lastImage.save(saveAsName)
             self.setStatus("Image saved.")
 
     def handlerSaveAsForButton(self):
-        saveAsName = tkFileDialog.asksaveasfilename(parent=self._parent,defaultextension='bmp',initialfile=time.strftime("%Y%m%d_%H%M%S"),filetypes=SAVE_FORMATS,title='Save image as...')
+        saveAsName = tkinter.filedialog.asksaveasfilename(parent=self._parent,defaultextension='bmp',initialfile=time.strftime("%Y%m%d_%H%M%S"),filetypes=SAVE_FORMATS,title='Save image as...')
         if len(saveAsName) > 0:
             self.setStatus("Saving image - Please wait...")
             self.lastImage.save(saveAsName)

@@ -1,19 +1,19 @@
 #!/usr/bin/python
 # -*- coding: iso-8859-1 -*-
 import threading
-import Queue
+import queue
 import time
 import logging
 
 try:
     import ctypes
 except ImportError:
-    raise ImportError, "The ctypes module is required for module wgwin32screensaver. See http://starship.python.net/crew/theller/ctypes/"
+    raise ImportError("The ctypes module is required for module wgwin32screensaver. See http://starship.python.net/crew/theller/ctypes/")
     
 try:
     import ImageWin
 except ImportError:
-    raise ImportError, "The ImageWin module of the library PIL (Python Imaging Library) is required for module wgwin32screensaver. See http://www.pythonware.com/products/pil/"
+    raise ImportError("The ImageWin module of the library PIL (Python Imaging Library) is required for module wgwin32screensaver. See http://www.pythonware.com/products/pil/")
 
 class win32con:
     ''' Win32 API constants (required for the screensaver) '''
@@ -37,7 +37,7 @@ class win32con:
     WM_QUIT = 18
     WM_RBUTTONDOWN = 516
     WS_EX_TOPMOST = 8
-    WS_POPUP = 0x80000000L
+    WS_POPUP = 0x80000000
     WS_VISIBLE = 0x10000000
 
 
@@ -95,7 +95,7 @@ class wgwin32screensaver(threading.Thread):
             imagedib is an optionnal PIL ImageWin.Dib object
         '''
         threading.Thread.__init__(self)
-        self.inputqueue = Queue.Queue()  # Put new images to display here (PIL ImageWin.Dib objects)
+        self.inputqueue = queue.Queue()  # Put new images to display here (PIL ImageWin.Dib objects)
         self.mousmove_count = 0   # Count how many times Windows has sent use the WM_MOUSEMOVE message.
         
         #open("\messages.log","a").write(str(id(self))+ " - " + str(time.time())+" : START ---------------------------------------\n")        
@@ -136,7 +136,7 @@ class wgwin32screensaver(threading.Thread):
                                     None) 
                                     
         if self.hwnd_screensaver == None:
-            raise WindowsError, "Could not create the screensaver Window (CreateWindowExA() returned None)."
+            raise WindowsError("Could not create the screensaver Window (CreateWindowExA() returned None).")
         
         # Show the Window (in case it's not yet visible.):
         ctypes.windll.user32.ShowWindow(self.hwnd_screensaver, win32con.SW_SHOW)         
@@ -155,7 +155,7 @@ class wgwin32screensaver(threading.Thread):
                 if image:
                     self.currentImage = image
                     ctypes.windll.user32.InvalidateRect(ctypes.c_int(self.hwnd_screensaver), None, False) # Force Window repaint
-            except Queue.Empty:
+            except queue.Empty:
                 pass
             time.sleep(0.1)   # Be gentle on CPU usage.
             

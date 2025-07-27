@@ -1023,12 +1023,12 @@ except IOError:
 import os
 import stat
 import threading
-import Queue
+import queue
 import socket
-import urllib
-import urllib2
+import urllib.request, urllib.parse, urllib.error
+import urllib.request, urllib.error, urllib.parse
 import re
-import StringIO
+import io
 import time
 import hashlib
 import random
@@ -1037,7 +1037,7 @@ import getopt
 import base64
 import binascii
 import getpass
-import ConfigParser
+import configparser
 import copy
 import logging
 
@@ -1093,8 +1093,8 @@ try:
   import ImageFilter
   import ImageChops
   import ImageDraw
-except ImportError, exc:
-  raise ImportError, "The PIL (Python Imaging Library) is required to run this program. See http://www.pythonware.com/products/pil/\nCould not import module because: %s" % exc 
+except ImportError as exc:
+  raise ImportError("The PIL (Python Imaging Library) is required to run this program. See http://www.pythonware.com/products/pil/\nCould not import module because: %s" % exc) 
 
 
 CTYPES_AVAILABLE = True
@@ -1130,7 +1130,7 @@ if CTYPES_AVAILABLE and sys.platform=="win32":
 
 # "IMAGE CREATED WITH WEBGOBBLER - HTTP://SEBSAUVAGE.NET/PYTHON/WEBGOBBLER/"
 # Font is '04B-11' from http://www.dsg4.com/04/extra/bitmap/
-WEBGOBBLER_LOGO = Image.open(StringIO.StringIO(base64.decodestring("""
+WEBGOBBLER_LOGO = Image.open(io.StringIO(base64.decodestring("""
 R0lGODlh9gEaANX/AP//////AOfn597e3t7eAM7Ozs3NzcbGxrq6urW1tbS0tK2traqqqqWlpZyc
 nJSUlISEhIKCgnx8fHt7e3V1dXNzc25ubmtra2pqamlpaWVlZWNjY2FhYWBgYFlZWVJSUlFRUUFB
 QUBAQDm9ADc3NzQ0NDIyMjGUADGTADExMS8vLy4uLi0tLSsrKyFzACFyACEhISAgIBoaGhhSAA8P
@@ -1149,7 +1149,7 @@ qWKRMZam5FPTReOlEwoYsNqNYBUAAghfpqnmmqJkgMB8OB6QwAUiyMDmnXjmOYgHDOCoyQIfqKCC
 noQWamgdHXAQQQMLPLABDCuQUMOhlFZqqRkmlMBCDDGoEIIKNlwq6qikYkFDCymo0IKdpbbq6quw
 xirrrLTWauutuOaq66689urrr8AKEgQAOw==""")))
 
-WEBGOBBLER_LOGO_TRANSPARENCY = Image.open(StringIO.StringIO(base64.decodestring("""
+WEBGOBBLER_LOGO_TRANSPARENCY = Image.open(io.StringIO(base64.decodestring("""
 R0lGODlh9gEaAPf/AP////Pz8/Ly8vHx8fDw8O/v7+7u7u3t7ezs7Ovr6+rq6unp6ejo6Ofn5+bm
 5uXl5eTk5OPj4+Li4uHh4d/f397e3t3d3dzc3Nra2tnZ2djY2NfX19bW1tXV1dTU1NPT09LS0tHR
 0dDQ0M/Pz87Ozs3NzczMzMvLy8rKysnJycjIyMfHx8bGxsXFxcTExMPDw8LCwsHBwcDAwL+/v76+
@@ -1236,7 +1236,7 @@ hbsOoQu/ABzAAjzABFzA8GsRGKERHGEvIbEwJoES/2vAEjzBFNwQAQEAOw==""")))
 WEBGOBBLER_LOGO_TRANSPARENCY = WEBGOBBLER_LOGO_TRANSPARENCY.convert("L") # Force greyscale
 
 
-PLEASE_WAIT_IMAGE = Image.open(StringIO.StringIO(base64.decodestring("""
+PLEASE_WAIT_IMAGE = Image.open(io.StringIO(base64.decodestring("""
 iVBORw0KGgoAAAANSUhEUgAAAfIAAAAbBAMAAAB1gxAdAAAAMFBMVEUAAACCgoLX19coKChSUlK2
 trb09PQPDw+dnZ1sbGw9PT3Gxsbp6ekbGxsyMjL////zNJnoAAAAAWJLR0QAiAUdSAAAAAlwSFlz
 AAAOxAAADsQBlSsOGwAABstJREFUWMPtmGuMG9UVx8+uvczau+M1hUQRonjbDxBCi/0hkCpIWQtS
@@ -1452,8 +1452,8 @@ class applicationConfig(dict):
         self.update( applicationConfig.DEFAULTCONFIG ) # Start with default configuration:
 
     def __setitem(self,key,value):
-        if not isinstance(key,basestring):
-            raise TypeError, "applicationConfig only accepts strings as keys."
+        if not isinstance(key,str):
+            raise TypeError("applicationConfig only accepts strings as keys.")
         
         self.data[key] = value   # Store the value
         
@@ -1473,7 +1473,7 @@ class applicationConfig(dict):
         ''' Outputs the configuration as a .INI file.
             Output: a string containing the configuration.
         '''
-        cp = ConfigParser.SafeConfigParser()
+        cp = configparser.SafeConfigParser()
         cp.add_section(applicationConfig.CONFIG_SECTIONNAME)
         # Export all parameters, except the non-exportable ones.
         for key in self:
@@ -1482,7 +1482,7 @@ class applicationConfig(dict):
                 if key == 'network.http.proxy.auth.password':
                     cp.set(applicationConfig.CONFIG_SECTIONNAME,key,self._garble(self[key])) # Garble the password.
                 elif key == 'blacklist.imagesha1':  # Serialize the list of blacklisted images
-                    cp.set(applicationConfig.CONFIG_SECTIONNAME,key,'|'.join(self[key].keys()))
+                    cp.set(applicationConfig.CONFIG_SECTIONNAME,key,'|'.join(list(self[key].keys())))
                 elif key == 'blacklist.url':  # Serialize the list of blacklisted URLs
                     cp.set(applicationConfig.CONFIG_SECTIONNAME,key,'|'.join([url.replace('%','%%') for url in self[key]]))
                     # (For ConfigParser, % must be escaped to %%)
@@ -1490,7 +1490,7 @@ class applicationConfig(dict):
                     cp.set(applicationConfig.CONFIG_SECTIONNAME,key,str(self[key]))
 
         # ConfigParser can only write to a file --> create a pseudo-file (inifile)
-        inifile = StringIO.StringIO()
+        inifile = io.StringIO()
         cp.write(inifile)
         data = inifile.getvalue()
         inifile.close()
@@ -1508,8 +1508,8 @@ class applicationConfig(dict):
         ''' Imports configuration from a .INI file.
             inidata : a string containing the .INI file.
         '''
-        inifile = StringIO.StringIO(inidata)
-        cp = ConfigParser.SafeConfigParser()
+        inifile = io.StringIO(inidata)
+        cp = configparser.SafeConfigParser()
         cp.readfp(inifile)  # FIXME: try/catch ConfigParser exceptions ?
         for (name, value) in cp.items(applicationConfig.CONFIG_SECTIONNAME):
                 
@@ -1528,17 +1528,17 @@ class applicationConfig(dict):
                 defaultvalue = applicationConfig.DEFAULTCONFIG[name]
                 obj = None
                 try:
-                    if isinstance(defaultvalue,basestring): obj = str(value).strip()
+                    if isinstance(defaultvalue,str): obj = str(value).strip()
                     elif isinstance(defaultvalue,bool):
                         if str(value).lower()=='true': obj = True
                         else: obj = False
                     elif isinstance(defaultvalue,int):  obj = int(value)
                     elif isinstance(defaultvalue,float):  obj = float(value)
-                    elif isinstance(value,dict): raise NotImplementedError,"applicationConfig.fromINI() : serialization of dictionnary objects is not implemented."
-                    elif isinstance(value,list): raise NotImplementedError,"applicationConfig.fromINI() : serialization of list objects is not implemented."
-                    else:  raise ValueError, "Could not convert parameter %s. Oops. Looks like an error in the program." % name
+                    elif isinstance(value,dict): raise NotImplementedError("applicationConfig.fromINI() : serialization of dictionnary objects is not implemented.")
+                    elif isinstance(value,list): raise NotImplementedError("applicationConfig.fromINI() : serialization of list objects is not implemented.")
+                    else:  raise ValueError("Could not convert parameter %s. Oops. Looks like an error in the program." % name)
                 except ValueError:
-                    raise ValueError, "Error in configuration: Parameter %s should be of type %s." % (name,type(defaultvalue) )
+                    raise ValueError("Error in configuration: Parameter %s should be of type %s." % (name,type(defaultvalue) ))
 
                 if name == 'network.http.proxy.auth.password':
                     obj =  self._ungarble(obj)  # Ungarbles the password.
@@ -1554,21 +1554,21 @@ class applicationConfig(dict):
         # We manually build a .INI file in memory from the registry.
         inilines = ['[%s]' % applicationConfig.CONFIG_SECTIONNAME]
         try:
-            import _winreg
-        except ImportError, exc:
-            raise ImportError, "applicationConfig.loadFromRegistryCurrentUser() can only be used under Windows (requires the _winreg module).\nCould not import module because: %s" % exc 
+            import winreg
+        except ImportError as exc:
+            raise ImportError("applicationConfig.loadFromRegistryCurrentUser() can only be used under Windows (requires the _winreg module).\nCould not import module because: %s" % exc) 
         try:
-            key = _winreg.OpenKey( _winreg.HKEY_CURRENT_USER, applicationConfig.CONFIG_REGPATH,0, _winreg.KEY_READ)
+            key = winreg.OpenKey( winreg.HKEY_CURRENT_USER, applicationConfig.CONFIG_REGPATH,0, winreg.KEY_READ)
             # Now get all values in this key:
             i = 0
             try:
                 while True:
-                    valueobj = _winreg.EnumValue(key,i) # mmm..strange, Should unpack to 3 values, but seems to unpack to more.  Bug of EnumValue() ?
+                    valueobj = winreg.EnumValue(key,i) # mmm..strange, Should unpack to 3 values, but seems to unpack to more.  Bug of EnumValue() ?
                     valuename = str(valueobj[0]).strip()
                     valuedata = str(valueobj[1]).strip()
                     valuetype = valueobj[2]
-                    if valuetype != _winreg.REG_SZ:
-                        raise TypeError, "The registry value %s does not have the correct type (REG_SZ). Please delete it." % valuename
+                    if valuetype != winreg.REG_SZ:
+                        raise TypeError("The registry value %s does not have the correct type (REG_SZ). Please delete it." % valuename)
                     else:
                         if valuename not in applicationConfig.NONEXPORTABLE_PARAMETERS:
                             inilines += [ '%s=%s' % (valuename,str(valuedata)) ]  # Build the .INI file.
@@ -1577,8 +1577,8 @@ class applicationConfig(dict):
                 pass  # EnvironmentError means: "No more values to read". We simply exit the 'While True' loop.
             self.fromINI('\n'.join(inilines))   # Then parse the generated .INI file.
         except EnvironmentError:
-            raise WindowsError, "Could not read configuration from registry !"
-        _winreg.CloseKey(key)
+            raise WindowsError("Could not read configuration from registry !")
+        winreg.CloseKey(key)
 
     def saveToRegistryCurrentUser(self):
         ''' Save configuration to Windows registry. '''
@@ -1589,18 +1589,18 @@ class applicationConfig(dict):
         #    assembler.emboss = False
         #    assembler.sizex = 1024
         try:
-            import _winreg
-        except ImportError, exc:
-            raise ImportError, "applicationConfig.saveToRegistryCurrentUser() can only be used under Windows (requires the _winreg module).\nCould not import module because: %s" % exc 
+            import winreg
+        except ImportError as exc:
+            raise ImportError("applicationConfig.saveToRegistryCurrentUser() can only be used under Windows (requires the _winreg module).\nCould not import module because: %s" % exc) 
         try:
-            key = _winreg.CreateKey(_winreg.HKEY_CURRENT_USER, applicationConfig.CONFIG_REGPATH)  # Create or open existing key
+            key = winreg.CreateKey(winreg.HKEY_CURRENT_USER, applicationConfig.CONFIG_REGPATH)  # Create or open existing key
             for line in self.toINI().split('\n')[1:]:
                 pname = line.split('=')[0]                # pname    : everything before the first =
                 strvalue = '='.join(line.split('=')[1:])  # strvalue : everything after the first =
-                _winreg.SetValueEx(key, pname.strip(),0, _winreg.REG_SZ, strvalue.strip())
+                winreg.SetValueEx(key, pname.strip(),0, winreg.REG_SZ, strvalue.strip())
         except EnvironmentError:
-            raise WindowsError, "Could not write configuration to registry !"
-        _winreg.CloseKey(key)
+            raise WindowsError("Could not write configuration to registry !")
+        winreg.CloseKey(key)
 
     def saveToFileInUserHomedir(self):
         ''' Save the configuration in .webGobblerConf in user's home dir. '''
@@ -1687,20 +1687,20 @@ class internetImage:
         
         # Build and send the HTTP request:
         request_headers = { 'User-Agent': self.CONFIG["network.http.useragent"] }
-        request = urllib2.Request(imageurl, None, request_headers)  # Build the HTTP request
+        request = urllib.request.Request(imageurl, None, request_headers)  # Build the HTTP request
         try:
-            urlfile = urllib2.urlopen(request)
-        except urllib2.HTTPError, exc:
+            urlfile = urllib.request.urlopen(request)
+        except urllib.error.HTTPError as exc:
             if exc.code == 404:
                 self.discardReason = "not found"  # Display a simplified message for HTTP Error 404.
             else:            
                 self.discardReason = "HTTP request failed with error %d (%s)" % (exc.code, exc.msg)
             return    # Discard this image.      
             # FIXME: display simplified error message for some other HTTP error codes ?
-        except urllib2.URLError, exc:
+        except urllib.error.URLError as exc:
             self.discardReason = exc.reason
             return    # Discard this image.
-        except Exception, exc:
+        except Exception as exc:
             self.discardReason = exc
             return    # Discard this image.
         #FIXME: catch HTTPError to catch Authentication requests ? (see urllib2 manual)
@@ -1709,7 +1709,7 @@ class internetImage:
         # If the returned Content-Type is not recognized, ignore the file.
         # ("image/jpeg", "image/gif", etc.)
         MIME_Type = urlfile.info().getheader("Content-Type","")
-        if not self.CONFIG["collector.acceptedmimetypes"].has_key(MIME_Type):
+        if MIME_Type not in self.CONFIG["collector.acceptedmimetypes"]:
             urlfile.close()
             self.discardReason = "not an image (%s)" % MIME_Type
             return
@@ -1759,7 +1759,7 @@ class internetImage:
 
         # Compute filename from file SHA1
         imagesha1 = hashlib.sha1(self.imagedata).hexdigest()
-        if self.CONFIG["blacklist.imagesha1"].has_key(imagesha1):  # discard blacklisted images
+        if imagesha1 in self.CONFIG["blacklist.imagesha1"]:  # discard blacklisted images
             self.discardReason = "blacklisted"
             return
         self.filename = 'WG'+imagesha1+file_extension  # SHA1 in hex + image extension
@@ -1794,7 +1794,7 @@ class internetImage:
                    Do not specify a filename (Filename is automatically computed).
         '''
         if self.isNotAnImage:
-            raise RuntimeError, "This is not an image. Cannot save."
+            raise RuntimeError("This is not an image. Cannot save.")
             # Shame shame, the caller should have discarded this image already !
         # FIXME: Should I implement try/except on the following file write operation ?
         try:
@@ -1822,7 +1822,7 @@ class collector(threading.Thread):
               dictionnaryFile (string): A filename+path to an optionnal word dictionnary.
         '''
         threading.Thread.__init__(self)
-        self.inputCommandQueue = Queue.Queue()   # Input commands (commandToken objects)
+        self.inputCommandQueue = queue.Queue()   # Input commands (commandToken objects)
         self.numberOfImagesToGet = 0     # By default, do not start to collect images.
         self.continuousCollect = False
         self.dictionnaryFile = dictionnaryFile  # Optional word dictionnary
@@ -1885,7 +1885,7 @@ class collector(threading.Thread):
                 else:
                     self._logError("Unknown command token")
                     pass  # Unknown command, ignore.
-            except Queue.Empty: # Else (if no command is available), do some stuff.
+            except queue.Empty: # Else (if no command is available), do some stuff.
                 try:
                     if self.continuousCollect: # collect continuously
                         self.numberOfImagesToGet = 1
@@ -1896,7 +1896,7 @@ class collector(threading.Thread):
                         time.sleep(0.25)
                     else:
                         time.sleep(0.25)
-                except Exception, exc:
+                except Exception as exc:
                     self._logException(exc)  # Log any unexpected exception
 
     def _setCurrentStatus(self,status,information):
@@ -1932,7 +1932,7 @@ class collector(threading.Thread):
             continuously (except when the pool decides there are enough images.)
         '''
         self._logError("collector._getRandomImage() is not implemented.")
-        raise NotImplementedError,"collector._getRandomImage()"
+        raise NotImplementedError("collector._getRandomImage()")
 
     def _generateRandomWord(self):
         ''' Generates a random word.
@@ -1987,11 +1987,11 @@ class collector(threading.Thread):
       results = None
       try:
           request_headers = { 'User-Agent': self.CONFIG["network.http.useragent"] }
-          request = urllib2.Request(url, None, request_headers)  # Build the HTTP request
-          htmlpage = urllib2.urlopen(request).read(2000000)  # Read at most 2 Mb.
+          request = urllib.request.Request(url, None, request_headers)  # Build the HTTP request
+          htmlpage = urllib.request.urlopen(request).read(2000000)  # Read at most 2 Mb.
           # FIXME: catch specific HTTP errors ?
           # FIXME: return HTTP errors ?
-      except Exception, exc:
+      except Exception as exc:
           self._logError('parsePage("'+url+'"): '+repr(exc))
           return (None,None)
       if regex: results = regex.findall(htmlpage)
@@ -2050,7 +2050,7 @@ class collector_local(collector):
 
         # Now choose a random image from scanned directories and copy it to the pool directory
         if len(self.filepaths) > 0:
-            filepath = random.choice(self.filepaths.keys()) # Choose a random file path
+            filepath = random.choice(list(self.filepaths.keys())) # Choose a random file path
             del self.filepaths[filepath]  # Remove it from the list
             self._logDebug("Getting %s" % filepath)
             self._setCurrentStatus('Copying file',filepath)
@@ -2064,7 +2064,7 @@ class collector_local(collector):
             if (len(imagedata)>0) and (len(imagedata) < 2000000):
                 # Compute filename from file SHA1
                 imagesha1 = hashlib.sha1(imagedata).hexdigest()
-                if not self.CONFIG["blacklist.imagesha1"].has_key(imagesha1):
+                if imagesha1 not in self.CONFIG["blacklist.imagesha1"]:
                     extension = filepath[filepath.rfind("."):].lower()  # Get file extension
                     outputfilename = 'WG'+imagesha1+extension   # SHA1 in hex + original image extension
                     imagedata += self.CONFIG["pool.sourcemark"] + filepath   # Add original URL in image file
@@ -2141,7 +2141,7 @@ class collector_deviantart(collector):
                     self._logDebug("Querying %s" % wordToSearch)
                     self._setCurrentStatus('Querying',wordToSearch)
                     # Get the search result page:
-                    request_url = "http://browse.deviantart.com/?order=5&q=%s&offset=%d" % (urllib.quote_plus(wordToSearch),random.randint(0,300)*24)
+                    request_url = "http://browse.deviantart.com/?order=5&q=%s&offset=%d" % (urllib.parse.quote_plus(wordToSearch),random.randint(0,300)*24)
                     (htmlpage,results) = self._parsePage(request_url,collector_deviantart.RE_ALLDEVIATIONID)
                     if not htmlpage:
                         self._logInfo("Unable to contact DeviantART.com. Waiting 60 seconds.") # Nevermind temporary failures
@@ -2251,10 +2251,10 @@ class collector_yahooimagesearch(collector):
                 self._setCurrentStatus('Querying',wordToSearch)
                 # We also get a random result page (between 0-50)
                 try:
-                    request_url = "http://images.search.yahoo.com/search/images?p=%s&b=%s" % (urllib.quote_plus(wordToSearch), random.randint(0,50)*20+1)
+                    request_url = "http://images.search.yahoo.com/search/images?p=%s&b=%s" % (urllib.parse.quote_plus(wordToSearch), random.randint(0,50)*20+1)
                     request_headers = { 'User-Agent': self.CONFIG["network.http.useragent"] }
-                    request = urllib2.Request(request_url, None, request_headers)  # Build the HTTP request
-                    htmlpage = urllib2.urlopen(request).read(500000)
+                    request = urllib.request.Request(request_url, None, request_headers)  # Build the HTTP request
+                    htmlpage = urllib.request.urlopen(request).read(500000)
                 except:
                     self._logWarning("Unable to contact images.search.yahoo.com. Waiting 60 seconds.")
                     self._setCurrentStatus('Error','Unable to contact images.search.yahoo.com. Waiting 60 seconds.')
@@ -2266,7 +2266,7 @@ class collector_yahooimagesearch(collector):
                         # Keep some of those URLs in memory.
                         # (and put the URLs in a dictionnary to remove duplicates)
                         if random.randint(0,1)==1:
-                            imageurl = urllib.unquote_plus(imageurl)
+                            imageurl = urllib.parse.unquote_plus(imageurl)
                             if not imageurl.startswith("http://"):
                                 imageurl = "http://"+imageurl
                             self.imageurls[imageurl] = 0
@@ -2296,7 +2296,7 @@ class collector_yahooimagesearch(collector):
         if not self.collectURL: 
             self.collectURL = not self.collectURL
             if len(self.imageurls)>0:
-                imageurl = random.choice(self.imageurls.keys())  # Choose a random image URL.
+                imageurl = random.choice(list(self.imageurls.keys()))  # Choose a random image URL.
                 del self.imageurls[imageurl]  # Remove it from list
                 self._setCurrentStatus('Downloading',imageurl)
                 self._logDebug(imageurl)
@@ -2337,7 +2337,7 @@ class collector_googleimages(collector):
                 self._logDebug("Querying '%s'"%wordToSearch)
                 self._setCurrentStatus('Querying',wordToSearch)
                 # We also get a random result page (between 0-50)
-                request_url = "http://images.google.com/images?q=%s&hl=en&start=%d" % (urllib.quote_plus(wordToSearch),random.randint(0,50)*10)
+                request_url = "http://images.google.com/images?q=%s&hl=en&start=%d" % (urllib.parse.quote_plus(wordToSearch),random.randint(0,50)*10)
                 (htmlpage,results) = self._parsePage(request_url,collector_googleimages.RE_IMAGEURL)
                 if not htmlpage:  # Error while getting page.
                     self._logWarning("Unable to contact google.com. Waiting 60 seconds.")
@@ -2358,12 +2358,12 @@ class collector_googleimages(collector):
                 else:   # Let's extract the image URLs. 
                     for imageurl in results:
                         if random.randint(0,1)==1:  # We only keep some of these URLs.
-                            imageurl = urllib.unquote_plus(imageurl)
+                            imageurl = urllib.parse.unquote_plus(imageurl)
                             if not imageurl.startswith("http://"): imageurl = "http://"+imageurl
                             self.imageurls[imageurl] = 0  # Put in the dictionnary to remove duplicates
         else:  # Download images:
             if len(self.imageurls)>0:
-                imageurl = random.choice(self.imageurls.keys())  # Choose a random image URL.
+                imageurl = random.choice(list(self.imageurls.keys()))  # Choose a random image URL.
                 del self.imageurls[imageurl]  # Remove it from list
                 self._logDebug(imageurl)
                 self._setCurrentStatus('Downloading',imageurl)
@@ -2408,7 +2408,7 @@ class collector_flickr(collector):
                     self._setCurrentStatus('Querying',wordToSearch)
                     # This looks ridiculous: flickr has more than 10 BILLION photos but won't let you search beyond page 67.
                     # So I use Google Image Search with site:flickr.com
-                    request_url = "http://images.google.com/images?q=site%%3Aflickr.com+%s&hl=en&start=%d" % (urllib.quote_plus(wordToSearch),random.randint(0,50)*10)
+                    request_url = "http://images.google.com/images?q=site%%3Aflickr.com+%s&hl=en&start=%d" % (urllib.parse.quote_plus(wordToSearch),random.randint(0,50)*10)
                     (htmlpage,results) = self._parsePage(request_url,collector_flickr.RE_GOOGLEIMAGES_IMAGEURL)
                 else:  # Random images:
                     pageNumber = random.randint(1,999999999)
@@ -2444,7 +2444,7 @@ class collector_flickr(collector):
                             self.imageurls[imageurl] = 0  # Put in the dictionnary to remove duplicates
         else:  # Download images:
             if len(self.imageurls)>0:
-                imageurl = random.choice(self.imageurls.keys())  # Choose a random image URL.
+                imageurl = random.choice(list(self.imageurls.keys()))  # Choose a random image URL.
                 del self.imageurls[imageurl]  # Remove it from list
                 self._logDebug(imageurl)
                 self._setCurrentStatus('Downloading',imageurl)
@@ -2465,8 +2465,8 @@ class imagePool(threading.Thread):
     def __init__(self,config):
         ''' config (applicationConfig object) : the program configuration '''
         threading.Thread.__init__(self)
-        self.inputCommandQueue = Queue.Queue()       # Input commands (commandToken objects)
-        self.outputImages = Queue.Queue()            # Output images taken from the pool (PIL.Image objects)
+        self.inputCommandQueue = queue.Queue()       # Input commands (commandToken objects)
+        self.outputImages = queue.Queue()            # Output images taken from the pool (PIL.Image objects)
         self.collectors = []                         # List of collector objects which download images from the internet (collector object descendants)
         self.delayBetweenChecks = 5                  # Seconds between image pool directory content check
         self.availableFiles = []                     # List of currently available images in the directory
@@ -2478,7 +2478,7 @@ class imagePool(threading.Thread):
             os.makedirs(self.CONFIG["pool.imagepooldirectory"])
         if not os.path.isdir(self.CONFIG["pool.imagepooldirectory"]):
             self._log.error("Could not create directory "+ os.path.abspath(self.CONFIG["pool.imagepooldirectory"]))
-            raise IOError, "Could not create directory "+ os.path.abspath(self.CONFIG["pool.imagepooldirectory"])
+            raise IOError("Could not create directory "+ os.path.abspath(self.CONFIG["pool.imagepooldirectory"]))
         self._log.debug("Using images in %s" % os.path.abspath(self.CONFIG["pool.imagepooldirectory"]))
         # Instanciate all collectors
         if self.CONFIG["collector.localonly"]:
@@ -2507,7 +2507,7 @@ class imagePool(threading.Thread):
                 else:
                     self._log.error("Unknown command token")
                     pass  # Unknown command, ignore.
-            except Queue.Empty:
+            except queue.Empty:
                 # Ensure there are always enough images in the directory.
                 # and start/stop the collector is there are not enough/enough pictures in the directory.
                 elapsed = time.time()-self.lastCheckTime  # Count time since last check.
@@ -2588,7 +2588,7 @@ class imagePool(threading.Thread):
         image = None
         try:
             image = self.outputImages.get_nowait()
-        except Queue.Empty:
+        except queue.Empty:
             pass
         return image
 
@@ -2601,7 +2601,7 @@ class imagePool(threading.Thread):
         while (image==None):
             try:
                 image = self.outputImages.get_nowait()
-            except Queue.Empty:
+            except queue.Empty:
                 pass
             time.sleep(0.25)
         return image
@@ -2645,8 +2645,8 @@ class assembler(threading.Thread):
             Derived classes may have additional parameters.
         '''
         threading.Thread.__init__(self)
-        self.inputCommandQueue = Queue.Queue()      # Input commands (commandToken objects)
-        self.outImageQueue = Queue.Queue()          # Queue where created images are put
+        self.inputCommandQueue = queue.Queue()      # Input commands (commandToken objects)
+        self.outImageQueue = queue.Queue()          # Queue where created images are put
         self.pool = pool                            # Image pool
         self.name = 'assembler'
         self.CONFIG = config
@@ -2673,7 +2673,7 @@ class assembler(threading.Thread):
                 else:
                     self._logError("Unknown command token")
                     pass  # Unknown command, ignore.
-            except Queue.Empty:
+            except queue.Empty:
                 #self._log("Nothing in queue")
                 time.sleep(0.5)
 
@@ -2688,7 +2688,7 @@ class assembler(threading.Thread):
             This call must succeed (caller does not expect image not to be saved.)
         '''
         self._logError("assembler.saveImageTo() is not implemented.")
-        raise NotImplementedError,"assembler.saveImageTo()"
+        raise NotImplementedError("assembler.saveImageTo()")
 
 class assembler_simple(assembler):
     ''' Outputs a single random image at the desired resolution (with filtering)
@@ -2829,8 +2829,8 @@ class assembler_superpose(threading.Thread):
         self.pool = pool                        # The image pool.
         self.pool.start()                       # Start the image pool right now.
         self.name = 'assembler_superpose'
-        self.inputCommandQueue = Queue.Queue()  # Input commands (commandToken objects)
-        self.superposeCompleted = Queue.Queue() # An object in this Queue means ._superpose() has completed its work.
+        self.inputCommandQueue = queue.Queue()  # Input commands (commandToken objects)
+        self.superposeCompleted = queue.Queue() # An object in this Queue means ._superpose() has completed its work.
         self.nbImagesToSuperpose = 0            # Number of images to superpose.
         self.currentImage = None                # Image currently beeing generated.
         self.blankImage = False                 # Should the superpose() blank image before starting ?
@@ -2871,7 +2871,7 @@ class assembler_superpose(threading.Thread):
                 else:
                     self._logError("Unknown command token")
                     pass  # Unknown command, ignore.
-            except Queue.Empty:
+            except queue.Empty:
                 if self.nbImagesToSuperpose > 0:  # Do we have images to assemble ?
                     self._superpose()  # Let's superpose one image. (This method will decrement self.nbImagesToSuperpose if successfull)
                     if self.nbImagesToSuperpose == 0:  # Are we done assembling images ?
@@ -2918,7 +2918,7 @@ class assembler_superpose(threading.Thread):
             self.nbImagesToSuperpose = self.nbImagesToSuperpose - 1
         except BadImage:
             self._logInfo("Broken image ; Ignoring.")
-        except Exception, exc:
+        except Exception as exc:
             self._logError("Could not assemble image because %s" % str(exc))
      
     def _superposeOneImage(self, currentImage, imageToSuperpose):
@@ -3074,8 +3074,8 @@ class assembler_superpose(threading.Thread):
             savepath = os.path.join(self.CONFIG["persistencedirectory"],"assembler_superpose_current.bmp")
             try:
               self.currentImage.save(savepath)
-            except IOError, exc:
-              raise IOError, "Could not save current image to %s because: %s" % (savepath,exc)
+            except IOError as exc:
+              raise IOError("Could not save current image to %s because: %s" % (savepath,exc))
 
     def _loadPreviousImage(self,ignorePreviousImage=False):
         ''' Try to get persisted image (image from previous run of program)
@@ -3133,7 +3133,7 @@ class assembler_superpose(threading.Thread):
             try:
                 self.superposeCompleted.get(block=True,timeout=1)
                 return
-            except Queue.Empty:
+            except queue.Empty:
                 if not self.isAlive(): return  # Do not wait for an answer if thread is dead !
                 time.sleep(0.25)
 
@@ -3230,13 +3230,13 @@ def gnomeWallpaperChanger(config, wallpaperPath='.'):
     
     try:
         import ctypes
-    except ImportError, exc:
-        raise ImportError, "The ctypes module is required to run the Gnome wallpaper changer. See http://starship.python.net/crew/theller/ctypes/\nCould not import module because: %s" % exc 
+    except ImportError as exc:
+        raise ImportError("The ctypes module is required to run the Gnome wallpaper changer. See http://starship.python.net/crew/theller/ctypes/\nCould not import module because: %s" % exc) 
 
     # Search the libgconf-2.so and load it
     gconf2_path=get_unix_lib("libgconf-2.so")
     if not gconf2_path:
-        raise OSError, "Is Gconf 2.x installed on your system? Older versions are currently unsupported. If you suspect a bug, please send me an email on frederic.weisbecker@wanadoo.fr"
+        raise OSError("Is Gconf 2.x installed on your system? Older versions are currently unsupported. If you suspect a bug, please send me an email on frederic.weisbecker@wanadoo.fr")
     gconf=ctypes.CDLL(gconf2_path)
     # Get Gconf Api necessary functions
     g_type_init=gconf.g_type_init
@@ -3292,15 +3292,15 @@ def kdeWallpaperChanger(config, wallpaperPath="."):
     
     try:
         import pcop
-    except ImportError, exc:
-        raise ImportError, "The python-dcop module is required to run The Kde wallpaper. Python-dcop is included into kdebindings (a part of kde). Your distribution probably have this package.\nCould not import module because: %s" % exc 
+    except ImportError as exc:
+        raise ImportError("The python-dcop module is required to run The Kde wallpaper. Python-dcop is included into kdebindings (a part of kde). Your distribution probably have this package.\nCould not import module because: %s" % exc) 
     
     # Does setWallpaper() 's kdesktop method exists?    
     wallpaper_methods=pcop.method_list("kdesktop","KBackgroundIface")
     try:
         wallpaper_methods.index('void setWallpaper(QString wallpaper,int mode)')
     except ValueError:
-        raise ValueError, "Webgobbler needs to use kde resources with dcop service to manage kde wallpaper. I'm unable to access kdesktop 's setWallpaper() method. Perhaps kde is not started or you are running a too old kde version."
+        raise ValueError("Webgobbler needs to use kde resources with dcop service to manage kde wallpaper. I'm unable to access kdesktop 's setWallpaper() method. Perhaps kde is not started or you are running a too old kde version.")
     
     wallpaperfilename = os.path.join(os.path.abspath(wallpaperPath),'webgobbler.bmp')
     a = assembler_superpose(pool=imagePool(config=config),config=config)
@@ -3347,8 +3347,8 @@ def windowsWallpaperChanger(config, wallpaperPath='.'):
     # FIXME: Option to restore old wallpaper on exit ?
     try:
         import ctypes
-    except ImportError, exc:
-        raise ImportError, "The ctypes module is required to run the Windows wallpaper changer. See http://starship.python.net/crew/theller/ctypes/\nCould not import module because: %s" % exc 
+    except ImportError as exc:
+        raise ImportError("The ctypes module is required to run the Windows wallpaper changer. See http://starship.python.net/crew/theller/ctypes/\nCould not import module because: %s" % exc) 
     SM_CXSCREEN = 0
     SM_CYSCREEN = 1
 
@@ -3424,12 +3424,12 @@ def windowsScreensaver(startmode,config):
     
     try:
         import wgwin32screensaver
-    except ImportError, exc:
-        raise ImportError, "wgwin32screensaver module is required to run the Windows screensaver.\nCould not import module because: %s" % exc 
+    except ImportError as exc:
+        raise ImportError("wgwin32screensaver module is required to run the Windows screensaver.\nCould not import module because: %s" % exc) 
 
     # Check parameters passed.
     if not (startmode in ('s','c','p','a')):
-        raise RuntimeError, "Parameter startmode=%s not supported by windowsScreensaver." % str(startmode)
+        raise RuntimeError("Parameter startmode=%s not supported by windowsScreensaver." % str(startmode))
 
     if startmode=='s':
         # Get current screen resolution:
@@ -3460,7 +3460,7 @@ def windowsScreensaver(startmode,config):
         return  # Ignore.  FIXME: Implement the preview mode.
 
     # else, display error:
-    raise NotImplementedError, "/%s option not implemented yet" % startmode
+    raise NotImplementedError("/%s option not implemented yet" % startmode)
 
 def x11Screensaver(config):
     ''' Start as XWindow Screensaver (XFree86) in a Linux/Unix os type.
@@ -3475,8 +3475,8 @@ def x11Screensaver(config):
     
     try:
         import wgx11screensaver
-    except ImportError, exc:
-        raise ImportError, "wgx11screensaver module is required to run the XWindow screensaver.\nCould not import module because: %s" % exc 
+    except ImportError as exc:
+        raise ImportError("wgx11screensaver module is required to run the XWindow screensaver.\nCould not import module because: %s" % exc) 
 
     # Define our unix_lib finder on wgx11screensaver module
     wgx11screensaver.get_unix_lib=get_unix_lib
@@ -3787,24 +3787,24 @@ def setUrllibProxy(log, CONFIG):
                            'pass' : CONFIG["network.http.proxy.auth.password"]
                          }
             # build a new opener that uses a proxy requiring authorization
-            proxy_support = urllib2.ProxyHandler({"http" :
+            proxy_support = urllib.request.ProxyHandler({"http" :
                             "http://%(user)s:%(pass)s@%(host)s:%(port)d" % proxy_info})
-            opener = urllib2.build_opener(proxy_support)
-            urllib2.install_opener(opener)  # install it as the default opener
+            opener = urllib.request.build_opener(proxy_support)
+            urllib.request.install_opener(opener)  # install it as the default opener
         else:  # Use proxy with no password
             proxy_info = { 'host' : CONFIG["network.http.proxy.address"],
                            'port' : CONFIG["network.http.proxy.port"]
                          }
             # build a new opener that uses a proxy
-            proxy_support = urllib2.ProxyHandler({"http" :
+            proxy_support = urllib.request.ProxyHandler({"http" :
                             "http://%(host)s:%(port)d" % proxy_info})
-            opener = urllib2.build_opener(proxy_support)
-            urllib2.install_opener(opener)  # install it as the default opener
+            opener = urllib.request.build_opener(proxy_support)
+            urllib.request.install_opener(opener)  # install it as the default opener
     else:
         # Disable proxy
         # (We have to disable any existing installed ProxyHandler):
-        opener = urllib2.build_opener()  # Get the default handler.
-        urllib2.install_opener(opener)  # install it as the default opener
+        opener = urllib.request.build_opener()  # Get the default handler.
+        urllib.request.install_opener(opener)  # install it as the default opener
         
         
     return CONFIG
@@ -3859,8 +3859,8 @@ def main():
                                                     'towindowswallpaper','norotation','resuperpose','guiconfig',
                                                     'saveconfreg','loadconfreg','saveconffile','loadconffile',
                                                     'xscreensaver','scale=','keywords='])
-    except getopt.GetoptError, ex:
-        print "Error in command-line: %s" % ex
+    except getopt.GetoptError as ex:
+        print(("Error in command-line: %s" % ex))
         #usage(sys.argv[0])  # print help information and exit:
         logging.shutdown()
         return
@@ -4092,17 +4092,17 @@ def webgobbler_application(config):
         os.environ['TCL_LIBRARY'] = 'libtcltk84\\tcl8.4'
         os.environ['TK_LIBRARY'] =  'libtcltk84\\tk8.4'
     
-    import Tkinter  # FIXME: try/catch import ?
+    import tkinter  # FIXME: try/catch import ?
 
     try:
         import Pmw
-    except ImportError, exc:
-        raise ImportError, "The Pmw (Python Megawidgets) module is required for the webGobbler application. See http://pmw.sourceforge.net/\nCould not import module because: %s" % exc 
+    except ImportError as exc:
+        raise ImportError("The Pmw (Python Megawidgets) module is required for the webGobbler application. See http://pmw.sourceforge.net/\nCould not import module because: %s" % exc) 
     try:
         import webgobbler_app
-    except ImportError, exc:        
-        raise ImportError, "The webgobbler_app module is required to run the webGobbler application.\nCould not import module because: %s" % exc 
-    root = Tkinter.Tk()              # Initialize Tkinter
+    except ImportError as exc:        
+        raise ImportError("The webgobbler_app module is required to run the webGobbler application.\nCould not import module because: %s" % exc) 
+    root = tkinter.Tk()              # Initialize Tkinter
     Pmw.initialise(root)             # Initialize Pmw
     root.title(VERSION)         # Set window title.    
     

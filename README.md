@@ -15,14 +15,14 @@ You can check the results in the [gallery](http://sebsauvage.net/galerie/?dir=we
 Requirements
 ============
 
-* Python 2.6 or 2.7
-* PIL ([Python Imaging Library](http://www.pythonware.com/products/pil/))
+* Python3 (developed with Python3.10)
+* Pillow ([Python Imaging Library](https://pypi.org/project/pillow/))
 
 
 Usage
 =====
 
-* Run in GUI mode: `python webgobbler.py` 
+* Run in GUI mode: `python webgobbler.py`
 * Display command-line options with: `python webgobbler.py --help`
 * Other example are available in command-line help screens.
 
