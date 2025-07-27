@@ -19,6 +19,15 @@ except ImportError:
     from local import collector_local
     from meta import commandToken
 
+# The known collectors:
+ALL_COLLECTORS = [
+    collector_googleimages,
+    collector_yahooimagesearch,
+    collector_flickr,
+    # ~ collector_deviantart,
+    collector_local
+]
+
 def get_collectors(config):
     if config["collector.localonly"]:
         return [collector_local(config=config)]
@@ -27,5 +36,6 @@ def get_collectors(config):
             collector_googleimages(config=config),
             collector_yahooimagesearch(config=config),
             collector_flickr(config=config),
-            collector_deviantart(config=config)
+            # ~ collector_deviantart(config=config)
             ]
+

@@ -34,6 +34,8 @@ except IOError:
 
 try:
   from PIL import Image
+  from PIL import ImageTk
+
   # ~ from PIL import ArgImagePlugin
   from PIL import BmpImagePlugin
   from PIL import CurImagePlugin

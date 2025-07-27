@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 
+WEBSITE = "http://sebsauvage.net/python/webgobbler"
+
 # License text will be used in the GUI.
 LICENSE='''This program is distributed under the OSI-certified zlib/libpng license.
 http://www.opensource.org/licenses/zlib-license.php
@@ -228,6 +230,31 @@ Examples:
   %s --loadconfreg --towindowswallpaper
      Run the wallpaper changer with the options saved in registry
      by --saveconfreg.
+'''
+
+ABOUTMESSAGE = '''
+
+%s
+
+webGobbler wanders the web, downloads random images and mixes them.
+
+Authors :
+        - Sébastien SAUVAGE (http://sebsauvage.net)
+        - Kilian (http://thesermon.free.fr/)
+
+Website : http://sebsauvage.net/webgobbler
+
+
+
+webGobbler was developped in Python (http://python.org)
+and uses the following libraries and programs:
+    - PIL (Python Imaging Library) : http://www.pythonware.com/products/pil/
+    - ctypes : http://starship.python.net/crew/theller/ctypes/
+    - Psyco : http://psyco.sourceforge.net/
+    - Pmw (Python MegaWidgets) : http://pmw.sourceforge.net/
+    - cxFreeze : http://starship.python.net/crew/atuining/cx_Freeze/
+    - AutoIt : http://www.autoitscript.com/autoit3/
+    - InnoSetup : http://www.jrsoftware.org/isinfo.php
 '''
 
 README = r'''

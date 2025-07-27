@@ -25,7 +25,7 @@ import logging
 socket.setdefaulttimeout(15)
 
 from utils.freeze_imports import Image, ImageFile, ImageOps,  ImageEnhance,  ImageFilter,  ImageChops,  ImageDraw
-from assets.docs import DISCLAIMER, LICENSE, README, PROGRAMHELP
+from assets.docs import DISCLAIMER, LICENSE, README, PROGRAMHELP, WEBSITE
 from assets.images import PLEASE_WAIT_IMAGE, WEBGOBBLER_LOGO, WEBGOBBLER_LOGO_TRANSPARENCY
 from settings import VERSION
 import settings
@@ -792,7 +792,6 @@ def get_unix_lib(lib_name):
 
     return None # Can't find it
 
-
 def gnomeWallpaperChanger(config, wallpaperPath='.'):
     ''' Like windowssWallpaperChanger(), This will automatically change the Wallpaper, but under Gnome desktop with Gconf 2.x '''
 
@@ -854,7 +853,6 @@ def gnomeWallpaperChanger(config, wallpaperPath='.'):
         a.shutdown()
         a.join()
 
-
 def kdeWallpaperChanger(config, wallpaperPath="."):
     '''Like windowsWallpaperChanger (), This will automatically change the Wallpaper, but under Kde 3.x Desktop (and perhaps older versions)'''
 
@@ -902,7 +900,6 @@ def kdeWallpaperChanger(config, wallpaperPath="."):
     finally:
         a.shutdown()
         a.join()
-
 
 def windowsWallpaperChanger(config, wallpaperPath='.'):
     ''' This will automatically change the Windows wallpaper.
@@ -968,7 +965,6 @@ def image_saver(config, imageName='webgobbler.bmp',generateSingleImage=False):
     finally:
         a.shutdown()
         a.join()
-
 
 def windowsScreensaver(startmode,config):
     ''' Start as Windows Screensaver
@@ -1071,8 +1067,6 @@ def x11Screensaver(config):
         a.shutdown()
         a.join()
         return
-
-
 
 def htmlPageGenerator(htmlFilename,config):
     ''' Generates a HTML page and a JPEG image.
@@ -1458,20 +1452,12 @@ def getConfig():
             configSource = 'default'
     return config
 
-
 def webgobbler_application(config):
     '''Runs webGobbler as a GUI application.
 
        config (applicationConfig object) : the configuration
     '''
     # Import all GUI stuff:
-
-    # The following tweak is used in the Windows binary distribution of
-    # webGobbler: The tcl/tk runtime is copied in a subdirectory
-    # just below the main executable.
-    if os.path.isdir('libtcltk84'):
-        os.environ['TCL_LIBRARY'] = 'libtcltk84\\tcl8.4'
-        os.environ['TK_LIBRARY'] =  'libtcltk84\\tk8.4'
 
     import tkinter  # FIXME: try/catch import ?
 
@@ -1490,9 +1476,8 @@ def webgobbler_application(config):
     # Display the application window:
     wgapp = webgobbler_app.wg_application(root,config)  # Build the GUI, and pass the program configuration.
     root.mainloop()                  # Display it and let is operate...
-    return
 
 if __name__ == "__main__":
-    sys.stdout.write(VERSION+" -- http://sebsauvage.net/python/webgobbler\n")
+    sys.stdout.write(f"{VERSION} -- {WEBSITE}\n")
     main()
 

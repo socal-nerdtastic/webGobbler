@@ -16,10 +16,12 @@ class collector_googleimages(collector):
         http://images.google.com/
         Used by: imagePool
     '''
+    name="collector_googleimages"
+    source = "Google"
+
     RE_IMAGEURL = re.compile(r'imgurl=(http://.+?)&',re.DOTALL|re.IGNORECASE)
     def __init__(self,**keywords):
         collector.__init__(self,**keywords)
-        self.name="collector_googleimages"
         self.imageurls = {}      # image URLs extracted from html result pages.
         self.waituntil = 0       # Wait until this date.
         self.collectURL = False  # Used to alternate between collecting URL and downloading images

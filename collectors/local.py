@@ -15,6 +15,8 @@ class collector_local(collector):
         to find images.
         Used by: imagePool.
     '''
+    name="collector_local"
+    source='Local disk'
 
     def __init__(self,**keywords):
         '''
@@ -23,7 +25,6 @@ class collector_local(collector):
         '''
         collector.__init__(self,**keywords)   # Call the mother class constructor.
         self.directoryToScan = self.CONFIG["collector.localonly.startdir"]
-        self.name="collector_local"
         self.remainingDirectories = [self.directoryToScan]  # Directories to scan
         self.filepaths = {}  # Paths to images
 

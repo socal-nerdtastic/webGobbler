@@ -1,9 +1,4 @@
-#!/usr/bin/python
-# -*- coding: iso-8859-1 -*-
-'''
-webGobbler application 1.2.8
-'''
-
+#!/usr/bin/python3
 
 try:
     import Pmw
@@ -12,32 +7,23 @@ except ImportError as exc:
 
 import sys,os,os.path
 
-if os.path.isdir('libtcltk84'):
-    os.environ['TCL_LIBRARY'] = 'libtcltk84\\tcl8.4'
-    os.environ['TK_LIBRARY'] =  'libtcltk84\\tk8.4'
-
 import time
 import tkinter
 import tkinter.filedialog
 import tkinter.font
-import threading,queue
 
 try:
     import webgobbler   # We import the webGobbler module.
 except ImportError as exc:
     raise ImportError("The webGobbler module is required to run this webGobbler configuration GUI. See http://sebsauvage.net/python/webgobbler/\nCould not import module because: %s" % exc)
-
-try:
-  from PIL import ImageTk
-except ImportError as exc:
-  raise ImportError("The 'pillow' module is required to run this program. See https://pypi.org/project/pillow\nCould not import module because: %s" % exc)
+from collectors import ALL_COLLECTORS
+from utils.freeze_imports import ImageTk
 
 CTYPES_AVAILABLE = True
 try:
     import ctypes
 except ImportError:
     CTYPES_AVAILABLE = False
-
 
 SAVE_FORMATS = (
     ('Windows Bitmap','*.bmp'),
@@ -103,12 +89,7 @@ class wg_application:
 
                 If collectorName does not exist, does nothing.
         '''
-        widgets = (None, None)
-        if collectorName == "collector_googleimages"      : widgets = (self.googleStatus,self.googleInfo)
-        elif collectorName == "collector_yahooimagesearch": widgets = (self.yahooStatus,self.yahooInfo)
-        elif collectorName == "collector_flickr"          : widgets = (self.flickrStatus,self.flickrInfo)
-        elif collectorName == "collector_deviantart"      : widgets = (self.deviantArtStatus,self.deviantArtInfo)
-        elif collectorName == "collector_local"           : widgets = (self.localdiskStatus,self.localdiskInfo)
+        widgets = self.collector_status.get(collectorName, (None, None))
 
         # If there is such widget, display its status:
         if widgets != (None,None):
@@ -122,12 +103,7 @@ class wg_application:
         # We poll each collector status every second.
 
         # The known collectors:
-        visitedCollectors = { "collector_googleimages": False,
-                               "collector_yahooimagesearch": False,
-                               "collector_flickr": False,
-                               "collector_deviantart": False,
-                               "collector_local": False
-                             }
+        visitedCollectors = {collector.name:False for collector in ALL_COLLECTORS}
 
         # Get the status of all collectors present in the assembler's pool:
         for collector in self.assembler.pool.collectors:
@@ -147,7 +123,6 @@ class wg_application:
 
         self.poolSize.configure(text = "%d on %d" % ( self.assembler.pool.getPoolSize(),self.config['pool.nbimages']))
 
-
         # Superpose a new image if delay is elapsed:
         if time.time() > (self.lastImageDate + self.config["program.every"]) and not self.currentlyAssembling:
             self._superpose()
@@ -158,8 +133,6 @@ class wg_application:
         self.assemblerState.configure(text=assemblerText)
 
         self.timerCollectorsStatus = self._parent.after(250, self._updateCollectorStatus)  # 0.25 seconds
-
-
 
     def _updateImage(self):
         ''' Update the image in window from the assembler.
@@ -190,7 +163,7 @@ class wg_application:
                 self.setStatus("webGobbler running.")
 
         # If the application is closing and the assembler has died, we can destroy the window.
-        if self.closing and not self.assembler.isAlive():
+        if self.closing and not self.assembler.is_alive():
             self.assembler.join()
             self._parent.destroy()
 
@@ -308,44 +281,33 @@ class wg_application:
         #self.statusFrame.pack(side='top',fill='x',expand=1)
         self.statusFrame.grid(column=0,row=0,sticky='ew')
 
-        # The Google status:
-        tkinter.Label(self.statusFrame,text='Google',anchor='w',bd=1,relief='sunken',font=smallFontBold).grid(column=0,row=0,sticky='ew')
-        self.googleStatus = tkinter.Label(self.statusFrame,text="Off",anchor='w',bd=1,relief='sunken',font=smallFont);  self.googleStatus.grid(column=1,row=0,sticky='ew')
-        self.googleInfo = tkinter.Label(self.statusFrame,text="",anchor='w',bd=1,relief='sunken',font=smallFont); self.googleInfo.grid(column=2,row=0,sticky='ew')
-
-        # The Yahoo status:
-        tkinter.Label(self.statusFrame,text='Yahoo',anchor='w',bd=1,relief='sunken',font=smallFontBold).grid(column=0,row=1,sticky='ew')
-        self.yahooStatus = tkinter.Label(self.statusFrame,text="Off",anchor='w',bd=1,relief='sunken',font=smallFont); self.yahooStatus.grid(column=1,row=1,sticky='ew')
-        self.yahooInfo = tkinter.Label(self.statusFrame,text="",anchor='w',bd=1,relief='sunken',font=smallFont); self.yahooInfo.grid(column=2,row=1,sticky='ew')
-
-        # The Flickr status:
-        tkinter.Label(self.statusFrame,text='Flickr',anchor='w',bd=1,relief='sunken',font=smallFontBold).grid(column=0,row=3,sticky='ew')
-        self.flickrStatus = tkinter.Label(self.statusFrame,text="Off",anchor='w',bd=1,relief='sunken',font=smallFont); self.flickrStatus.grid(column=1,row=3,sticky='ew')
-        self.flickrInfo = tkinter.Label(self.statusFrame,text="",anchor='w',bd=1,relief='sunken',font=smallFont); self.flickrInfo.grid(column=2,row=3,sticky='ew')
-
-        # The DeviantArt status:
-        tkinter.Label(self.statusFrame,text='DeviantArt',anchor='w',bd=1,relief='sunken',font=smallFontBold).grid(column=0,row=4,sticky='ew')
-        self.deviantArtStatus = tkinter.Label(self.statusFrame,text="Off",anchor='w',bd=1,relief='sunken',font=smallFont); self.deviantArtStatus.grid(column=1,row=4,sticky='ew')
-        self.deviantArtInfo = tkinter.Label(self.statusFrame,text="",anchor='w',bd=1,relief='sunken',font=smallFont); self.deviantArtInfo.grid(column=2,row=4,sticky='ew')
-
-        # The local disk status:
-        tkinter.Label(self.statusFrame,text='Local disk',anchor='w',bd=1,relief='sunken',font=smallFontBold).grid(column=0,row=5,sticky='ew')
-        self.localdiskStatus = tkinter.Label(self.statusFrame,text="Off",anchor='w',bd=1,relief='sunken',font=smallFont); self.localdiskStatus.grid(column=1,row=5,sticky='ew')
-        self.localdiskInfo = tkinter.Label(self.statusFrame,text="",anchor='w',bd=1,relief='sunken',font=smallFont); self.localdiskInfo.grid(column=2,row=5,sticky='ew')
+        self.collector_status = {}
+        for rownum, coll in enumerate(ALL_COLLECTORS):
+            lbl = tkinter.Label(self.statusFrame,text=coll.source,anchor='w',bd=1,relief='sunken',font=smallFontBold)
+            lbl.grid(column=0,row=rownum,sticky='ew')
+            status_lbl = tkinter.Label(self.statusFrame,text="Off",anchor='w',bd=1,relief='sunken',font=smallFont)
+            status_lbl.grid(column=1,row=rownum,sticky='ew')
+            info_lbl = tkinter.Label(self.statusFrame,text="",anchor='w',bd=1,relief='sunken',font=smallFont)
+            info_lbl.grid(column=2,row=rownum,sticky='ew')
+            self.collector_status[coll.name] = (status_lbl, info_lbl)
 
         # The pool state:
-        tkinter.Label(self.statusFrame,text='Number of images in pool:',anchor='w',bd=1,relief='sunken',font=smallFontBold).grid(column=0,row=6,sticky='ew',columnspan=2)
-        self.poolSize = tkinter.Label(self.statusFrame,text="",anchor='w',bd=1,relief='sunken',font=smallFont); self.poolSize.grid(column=2,row=6,sticky='ew')
+        rownum += 1
+        lbl = tkinter.Label(self.statusFrame,text='Number of images in pool:',anchor='w',bd=1,relief='sunken',font=smallFontBold)
+        lbl.grid(column=0,row=rownum,sticky='ew',columnspan=2)
+        self.poolSize = tkinter.Label(self.statusFrame,text="",anchor='w',bd=1,relief='sunken',font=smallFont)
+        self.poolSize.grid(column=2,row=6,sticky='ew')
 
         # The image assembler state:
-        tkinter.Label(self.statusFrame,text='Image assembler:',anchor='w',bd=1,relief='sunken',font=smallFontBold).grid(column=0,row=7,sticky='ew',columnspan=2)
-        self.assemblerState = tkinter.Label(self.statusFrame,text="Waiting",anchor='w',bd=1,relief='sunken',font=smallFont); self.assemblerState.grid(column=2,row=7,sticky='ew')
-
+        rownum += 1
+        lbl = tkinter.Label(self.statusFrame,text='Image assembler:',anchor='w',bd=1,relief='sunken',font=smallFontBold)
+        lbl.grid(column=0,row=rownum,sticky='ew',columnspan=2)
+        self.assemblerState = tkinter.Label(self.statusFrame,text="Waiting",anchor='w',bd=1,relief='sunken',font=smallFont)
+        self.assemblerState.grid(column=2,row=7,sticky='ew')
 
         # Allow the information columns to expand
         self.statusFrame.columnconfigure(1,minsize=95)
         self.statusFrame.columnconfigure(2,weight=1,minsize=200)
-
 
         # ======================================================================
         # The scrollable frame which contains the image:
@@ -452,7 +414,7 @@ class wg_application:
         dialog = Pmw.MessageDialog(self._parent,  title = 'Confirmation',
                  message_text = 'Do you really want to discard current image and start a new one ?',
                  buttons = ('Yes,\nstart new image', 'NO,\nkeep current image'),
-                 defaultbutton = 'NO,\keep current image')
+                 defaultbutton = 'NO,\nkeep current image')
         result = dialog.activate()
         dialog.withdraw()
         if result == 'Yes,\nstart new image':

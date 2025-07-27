@@ -16,6 +16,8 @@ class collector_flickr(collector):
         http://flickr.com
         Used by: imagePool
     '''
+    name="collector_flickr"
+    source="Flickr"
 
     # Regexp to get all images (eg. "http://static.flickr.com/36/94902996_d58bec5e04_t.jpg") from http://flickr.com/photos/?start=x
     #                                http://farm9.staticflickr.com/8540/8631778383_0724517a90_t.jpg
@@ -24,7 +26,6 @@ class collector_flickr(collector):
     #RE_IMAGEURL = re.compile('<img src="(http://www.randomimage.us/files/.+?)"',re.DOTALL|re.IGNORECASE)
     def __init__(self,**keywords):
         collector.__init__(self,**keywords)
-        self.name="collector_flickr"
         self.imageurls = {}  # URLs of images (eg."http://static.flickr.com/36/94902996_d58bec5e04_o.jpg")
         self.waituntil = 0         # Wait until this date.
         self.collectURL = False     # Used to alternate between collecting URL and downloading images

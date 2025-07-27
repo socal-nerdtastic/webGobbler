@@ -19,6 +19,9 @@ class collector_deviantart(collector):
         computer-generated images, etc.
         Used by: imagePool.
     '''
+    name="collector_deviantart"
+    source="Obsolete"
+
     # Regular expression used to extract the image URL from a random deviant Art page.
     RE_IMAGEURL = re.compile(r'<meta name="og:image" content="(.+?\.(jpg|png|gif))">',re.DOTALL|re.IGNORECASE)
 
@@ -27,7 +30,6 @@ class collector_deviantart(collector):
 
     def __init__(self,**keywords):
         collector.__init__(self,**keywords)   # Call the mother class constructor.
-        self.name="collector_deviantart"
         self.max_deviationid = -1  # We do not know yet what if the maximum deviationID
         self.deviationIDs = []     # List of deviantionIDs (DeviantArt picture identifier). Used only for keyword search.
         self.imageurltoget = ""    # URL of image to get.

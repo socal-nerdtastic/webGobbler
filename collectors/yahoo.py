@@ -17,11 +17,12 @@ class collector_yahooimagesearch(collector):
         (AllTheWeb.com image search also uses Yahoo database.)
         Used by: imagePool
     '''
+    name="collector_yahooimagesearch"
+    source='Yahoo'
     #RE_IMAGEURL = re.compile('&imgcurl=(.+?)&',re.DOTALL|re.IGNORECASE)
     RE_IMAGEURL = re.compile('&imgurl=(.+?)&',re.DOTALL|re.IGNORECASE)
     def __init__(self,**keywords):
         collector.__init__(self,**keywords)
-        self.name="collector_yahooimagesearch"
         self.imageurls = {}  # image URLs extracted from html result pages.
         self.waituntil = 0         # Wait until this date.
         self.collectURL = True     # Used to alternate between collecting URL and downloading images

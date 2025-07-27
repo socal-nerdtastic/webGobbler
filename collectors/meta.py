@@ -184,6 +184,7 @@ class collector(threading.Thread):
             (ideally get only one picture)
         Used by: imagePool
     '''
+    name="collector"
     def __init__(self,config,dictionnaryFile=None):
         ''' Download random images
               config (an applicationConfig object) : the program configuration
@@ -194,7 +195,6 @@ class collector(threading.Thread):
         self.numberOfImagesToGet = 0     # By default, do not start to collect images.
         self.continuousCollect = False
         self.dictionnaryFile = dictionnaryFile  # Optional word dictionnary
-        self.name="collector"
         self.CONFIG=config
         self.statusLock = threading.RLock()  # A lock to access collector status.
         self.status = ('Stopped','')    # Status of this collector
