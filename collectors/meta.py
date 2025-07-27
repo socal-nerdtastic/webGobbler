@@ -364,7 +364,7 @@ class collector(threading.Thread):
           # FIXME: return HTTP errors ?
       except Exception as exc:
           self._logError('parsePage("'+url+'"): '+repr(exc))
-          return (None,None)
+          return (None,[])
       if regex:
           results = regex.findall(htmlpage)
       return (htmlpage, results)

@@ -68,7 +68,7 @@ class applicationConfig(dict):
         ''' Outputs the configuration as a .INI file.
             Output: a string containing the configuration.
         '''
-        cp = configparser.SafeConfigParser()
+        cp = configparser.ConfigParser()
         cp.add_section(settings.CONFIG_SECTIONNAME)
         # Export all parameters, except the non-exportable ones.
         for key in self:
@@ -103,9 +103,8 @@ class applicationConfig(dict):
         ''' Imports configuration from a .INI file.
             inidata : a string containing the .INI file.
         '''
-        inifile = io.StringIO(inidata)
-        cp = configparser.SafeConfigParser()
-        cp.readfp(inifile)  # FIXME: try/catch ConfigParser exceptions ?
+        cp = configparser.ConfigParser()
+        cp.read_string(inidata)  # FIXME: try/catch ConfigParser exceptions ?
         for (name, value) in cp.items(settings.CONFIG_SECTIONNAME):
 
             doCoerceType = True
@@ -129,7 +128,7 @@ class applicationConfig(dict):
                         else: obj = False
                     elif isinstance(defaultvalue,int):  obj = int(value)
                     elif isinstance(defaultvalue,float):  obj = float(value)
-                    elif isinstance(value,dict): raise NotImplementedError("applicationConfig.fromINI() : serialization of dictionnary objects is not implemented.")
+                    elif isinstance(value,dict): raise NotImplementedError("applicationConfig.fromINI() : serialization of dictionary objects is not implemented.")
                     elif isinstance(value,list): raise NotImplementedError("applicationConfig.fromINI() : serialization of list objects is not implemented.")
                     else:  raise ValueError("Could not convert parameter %s. Oops. Looks like an error in the program." % name)
                 except ValueError:
@@ -144,68 +143,12 @@ class applicationConfig(dict):
                 # else store this unknown parameter as string
                 self[name] = value
 
-    def loadFromRegistryCurrentUser(self):
-        ''' Load configuration from Windows registry. '''
-        # We manually build a .INI file in memory from the registry.
-        inilines = ['[%s]' % settings.CONFIG_SECTIONNAME]
-        try:
-            import winreg
-        except ImportError as exc:
-            raise ImportError("applicationConfig.loadFromRegistryCurrentUser() can only be used under Windows (requires the _winreg module).\nCould not import module because: %s" % exc)
-        try:
-            key = winreg.OpenKey( winreg.HKEY_CURRENT_USER, settings.CONFIG_REGPATH,0, winreg.KEY_READ)
-            # Now get all values in this key:
-            i = 0
-            try:
-                while True:
-                    valueobj = winreg.EnumValue(key,i) # mmm..strange, Should unpack to 3 values, but seems to unpack to more.  Bug of EnumValue() ?
-                    valuename = str(valueobj[0]).strip()
-                    valuedata = str(valueobj[1]).strip()
-                    valuetype = valueobj[2]
-                    if valuetype != winreg.REG_SZ:
-                        raise TypeError("The registry value %s does not have the correct type (REG_SZ). Please delete it." % valuename)
-                    else:
-                        if valuename not in settings.NONEXPORTABLE_PARAMETERS:
-                            inilines += [ '%s=%s' % (valuename,str(valuedata)) ]  # Build the .INI file.
-                    i += 1
-            except EnvironmentError:
-                pass  # EnvironmentError means: "No more values to read". We simply exit the 'While True' loop.
-            self.fromINI('\n'.join(inilines))   # Then parse the generated .INI file.
-        except EnvironmentError:
-            raise WindowsError("Could not read configuration from registry !")
-        winreg.CloseKey(key)
-
-    def saveToRegistryCurrentUser(self):
-        ''' Save configuration to Windows registry. '''
-        # Note: this uses the output of self.toINI()
-        # This method expects the .INI file to contain a single section,
-        # started on first line, and no comments.
-        # eg.[webGobbler]
-        #    assembler.emboss = False
-        #    assembler.sizex = 1024
-        try:
-            import winreg
-        except ImportError as exc:
-            raise ImportError("applicationConfig.saveToRegistryCurrentUser() can only be used under Windows (requires the _winreg module).\nCould not import module because: %s" % exc)
-        try:
-            key = winreg.CreateKey(winreg.HKEY_CURRENT_USER, settings.CONFIG_REGPATH)  # Create or open existing key
-            for line in self.toINI().split('\n')[1:]:
-                pname = line.split('=')[0]                # pname    : everything before the first =
-                strvalue = '='.join(line.split('=')[1:])  # strvalue : everything after the first =
-                winreg.SetValueEx(key, pname.strip(),0, winreg.REG_SZ, strvalue.strip())
-        except EnvironmentError:
-            raise WindowsError("Could not write configuration to registry !")
-        winreg.CloseKey(key)
-
     def saveToFileInUserHomedir(self):
         ''' Save the configuration in .webGobblerConf in user's home dir. '''
-        # Mainly for Unix/Linux. Windows users will probably prefer saveToRegistryCurrentUser()
         inidata = self.toINI()
-        userhomedir = os.path.expanduser('~')  # Get user home directory.
-        filepath = os.path.join(userhomedir,settings.CONFIG_FILENAME)
-        file = open(filepath,"w+b")
-        file.write(inidata)
-        file.close()
+        filepath = self.configFilename()
+        with open(filepath,"w") as f:
+            f.write(inidata)
 
     def configFilename(self):
         ''' Returns the absolute path where the .ini file is supposed to be read/saved. '''
@@ -213,27 +156,25 @@ class applicationConfig(dict):
 
     def loadFromFileInUserHomedir(self):
         ''' Loads the configuration from .webGobblerConf in user's home dir. '''
-        # Mainly for Unix/Linux. Windows users will probably prefer loadFromRegistryCurrentUser()
-        userhomedir = os.path.expanduser('~')  # Get user home directory.
-        filepath = os.path.join(userhomedir,settings.CONFIG_FILENAME)
-        file = open(filepath,"rb")
-        inidata = file.read(50000)
-        file.close()
+        filepath = self.configFilename()
+        with open(filepath,"r") as f:
+            inidata = f.read(50000)
         self.fromINI(inidata)
 
     def _garble(self, text):
         ''' Returns a garbled version of a string. '''
         # This is no replacement for a good cipher !
         # text IS NOT ENCRYPTED. Is it only self-garbled.
-        h=hashlib.sha1(text).digest()
+        h=hashlib.sha1(text.encode()).digest()
         hk=h*int(len(text)/20+1)
-        et=''.join([chr(ord(text[i])^ord(hk[i])) for i in range(len(text))])
-        return binascii.hexlify(h+et)
+        et=bytearray(ord(text[i])^hk[i] for i in range(len(text)))
+        return binascii.hexlify(h+et).decode()
 
     def _ungarble(self, text):
         ''' Un-garbles the text garbled with _garble(). '''
         d=binascii.unhexlify(text)
         (h,t)=(d[0:20],d[20:])
         hk=h*int(len(t)/20+1)
-        return ''.join([chr(ord(t[i])^ord(hk[i])) for i in range(len(t))])
+        return ''.join([chr(t[i]^hk[i]) for i in range(len(t))])
+
 

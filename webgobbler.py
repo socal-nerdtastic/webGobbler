@@ -1433,23 +1433,11 @@ def getConfig():
     '''
     config = applicationConfig()  # Get a new applicationConfig object.
     configSource = None
-    # First, we try to read configuration from registry.
     try:
-        config.loadFromRegistryCurrentUser()
-        configSource = "registry"
-    except ImportError:
-        pass
-    except WindowsError:
-        pass
-
-    if configSource == None:
-        # We are probably not under Windows, or the registry could not be read.
-        # We try to read the .ini file in user's home directory:
-        try:
-            config.loadFromFileInUserHomedir()
-            configSource = "inifile"
-        except:
-            configSource = 'default'
+        config.loadFromFileInUserHomedir()
+        configSource = "inifile"
+    except:
+        configSource = 'default'
     return config
 
 def webgobbler_application(config):

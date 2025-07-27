@@ -86,18 +86,8 @@ class wg_confGUI(tkinter.Toplevel):  # FIXME: Should I derive from Frame so that
             raise NotImplementedError
         self.config = webgobbler.applicationConfig()  # Get a new applicationConfig object.
         self.configSource = None
-        # First, we try to read configuration from registry.
-        try:
-            self.config.loadFromRegistryCurrentUser()
-            self.configSource = "registry"
-        except ImportError:
-            pass
-        except WindowsError:
-            pass
 
         if self.configSource == None:
-            # We are probably not under Windows, or the registry could not be read.
-            # We try to read the .ini file in user's home directory:
             try:
                 self.config.loadFromFileInUserHomedir()
                 self.configSource = "inifile"
@@ -108,21 +98,13 @@ class wg_confGUI(tkinter.Toplevel):  # FIXME: Should I derive from Frame so that
         self.configToGUI(self.config)
 
     def saveConfig(self):
-        ''' Save configuration from the GUI to registry or .ini file.'''
+        ''' Save configuration from the GUI or .ini file.'''
         # Get all data from the GUI back into the applicationConfig object:
         self.GUItoConfig(self.config)
 
         # We first try to save config from where we got it.
         configSaved = False
-        if self.configSource == 'registry':
-            try:
-                self.config.saveToRegistryCurrentUser()
-                configSaved = True
-            except ImportError:
-                pass
-            except WindowsError:
-                pass
-        elif self.configSource == 'inifile':
+        if self.configSource == 'inifile':
             try:
                 self.config.saveToFileInUserHomedir()
                 configSaved = True
@@ -131,16 +113,6 @@ class wg_confGUI(tkinter.Toplevel):  # FIXME: Should I derive from Frame so that
 
         # If configuration was not properly saved, try to save by another mean:
         if not configSaved:
-            self.configSource == 'default'
-            try:  # Try registry first.
-                self.config.saveToRegistryCurrentUser()
-                configSaved = True
-                self.configSource = "registry"
-            except ImportError:
-                pass
-            except WindowsError:
-                pass
-        if not configSaved:  # If save into registry failed, try to .ini file.
             self.configSource = 'default'
             try:
                 self.config.saveToFileInUserHomedir()
@@ -148,7 +120,7 @@ class wg_confGUI(tkinter.Toplevel):  # FIXME: Should I derive from Frame so that
                 self.configSource = "inifile"
             except ImportError:
                 pass
-            except WindowsError:
+            except OSError:
                 pass
 
         if not configSaved:
@@ -170,8 +142,6 @@ class wg_confGUI(tkinter.Toplevel):  # FIXME: Should I derive from Frame so that
     def _initializeGUI(self):
         ''' This method creates all the GUI widgets. '''
         # GUI programming sucks.
-
-
 
         boldFont = tkinter.font.Font(weight='bold',size=-11)  # A simple bold font.
         smallFont = tkinter.font.Font(size=-9)  # A smaller font (for blacklists)
