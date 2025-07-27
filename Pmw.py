@@ -1,12 +1,9 @@
 
 import PmwColor
 Color = PmwColor
-del PmwColor
 
 import PmwBlt
 Blt = PmwBlt
-del PmwBlt
-
 
 ### Loader functions:
 
@@ -61,7 +58,7 @@ import collections
 
 # tkinter 8.5 -> 8.6 fixed a problem in which selected indexes
 # were reported as strings instead of ints
-# by default emulate the same functionality so we don't break 
+# by default emulate the same functionality so we don't break
 # existing interfaces but allow for easy switching
 #_forceTkinter85Compatibility = True
 
@@ -69,7 +66,7 @@ import collections
 #    global _forceTkinter85Compatibility
 #    if isinstance(value, bool):
 #        _forceTkinter85Compatibility = value and tkinter.TkVersion > 8.5
-        
+
 #def emulateTk85():
 #    global _forceTkinter85Compatibility
 #    return _forceTkinter85Compatibility
@@ -1024,7 +1021,7 @@ class MegaToplevel(MegaArchetype):
 
         # Initialise the base class (after defining the options).
         super().__init__(parent, tkinter.Toplevel)
-        
+
         # Initialise instance.
 
         # Set WM_DELETE_WINDOW protocol, deleting any old callback, so
@@ -1264,7 +1261,7 @@ def tracetk(root = None, on = 1, withStackTrace = 0, file=None):
 
     if root is None:
         root = tkinter._default_root
-    
+
     _withStackTrace = withStackTrace
     _traceTk = on
     if on == 1:
@@ -1517,7 +1514,7 @@ def initialise(
 
     # Set the base font size for the application and set the
     # Tk option database font resources.
-    
+
     _font_initialise(root, size, fontScheme)
     return root
 
@@ -1653,7 +1650,6 @@ _haveBltBusy = None
 def _havebltbusy(window):
     global _busy_hold, _busy_release, _haveBltBusy
     if _haveBltBusy is None:
-        from . import PmwBlt
         _haveBltBusy = PmwBlt.havebltbusy(window)
         _busy_hold = PmwBlt.busy_hold
         if os.name == 'nt':
@@ -2005,7 +2001,7 @@ class Dialog(MegaToplevel):
     def __init__(self, parent = None, **kw):
 
         # Define the megawidget options.
-        
+
         optiondefs = (
             ('buttonbox_hull_borderwidth',   1,         None),
             ('buttonbox_hull_relief',        'raised',  None),
@@ -2194,7 +2190,7 @@ def timestringtoseconds(text, separator = ':'):
     hour = int(inputList[0])
     minute = int(inputList[1])
     second = int(inputList[2])
-    
+
     if minute >= 60 or second >= 60:
         raise ValueError('invalid value: ' + text)
     return sign * (hour * 60 * 60 + minute * 60 + second)
@@ -2712,7 +2708,7 @@ class ButtonBox(MegaWidget):
     def __init__(self, parent = None, **kw):
 
         # Define the megawidget options.
-        
+
         optiondefs = (
             ('labelmargin',       0,              INITOPT),
             ('labelpos',          None,           INITOPT),
@@ -2948,7 +2944,7 @@ class EntryField(MegaWidget):
     def __init__(self, parent = None, **kw):
 
         # Define the megawidget options.
-        
+
         optiondefs = (
             ('command',           None,        None),
             ('errorbackground',   'pink',      None),
@@ -3423,7 +3419,7 @@ class Group( MegaWidget ):
 
         # Define the megawidget options.
 
-        
+
         optiondefs = (
             ('collapsedheight',  6,         INITOPT),
             ('collapsedwidth',   20,        INITOPT),
@@ -3517,7 +3513,7 @@ class LabeledWidget(MegaWidget):
     def __init__(self, parent = None, **kw):
 
         # Define the megawidget options.
-        
+
         optiondefs = (
             ('labelmargin',            0,      INITOPT),
             ('labelpos',               None,   INITOPT),
@@ -3559,7 +3555,7 @@ class MainMenuBar(MegaArchetype):
     def __init__(self, parent = None, **kw):
 
         # Define the megawidget options.
-        
+
         optiondefs = (
             ('balloon',      None,       None),
             ('hotkeys',      1,          INITOPT),
@@ -3787,7 +3783,7 @@ class MenuBar(MegaWidget):
     def __init__(self, parent = None, **kw):
 
         # Define the megawidget options.
-        
+
         optiondefs = (
             ('balloon',      None,       None),
             ('hotkeys',      1,          INITOPT),
@@ -4031,7 +4027,7 @@ class MessageBar(MegaWidget):
     def __init__(self, parent = None, **kw):
 
         # Define the megawidget options.
-        
+
         defaultMessageTypes = {
                            # (priority, showtime, bells, logmessage)
             'systemerror'  : (5, 10, 2, 1),
@@ -4176,7 +4172,7 @@ class MessageDialog(Dialog):
     def __init__(self, parent = None, **kw):
 
         # Define the megawidget options.
-        
+
         optiondefs = (
             ('borderx',       20,    INITOPT),
             ('bordery',       20,    INITOPT),
@@ -4252,7 +4248,7 @@ class NoteBook(MegaArchetype):
     def __init__(self, parent = None, **kw):
 
         # Define the megawidget options.
-        
+
         optiondefs = (
             ('hull_highlightthickness',  0,           None),
             ('hull_borderwidth',         0,           None),
@@ -4871,7 +4867,7 @@ class OptionMenu(MegaWidget):
     def __init__(self, parent = None, **kw):
 
         # Define the megawidget options.
-        
+
         optiondefs = (
             ('command',        None,       None),
             ('items',          (),         INITOPT),
@@ -5026,7 +5022,7 @@ class PanedWidget(MegaWidget):
     def __init__(self, parent = None, **kw):
 
         # Define the megawidget options.
-        
+
         optiondefs = (
             ('command',            None,         None),
             ('orient',             'vertical',   INITOPT),
@@ -5165,7 +5161,7 @@ class PanedWidget(MegaWidget):
         # Note that, since the hull is a frame, the width and height
         # options specify the geometry *outside* the borderwidth and
         # highlightthickness.
-        
+
         bw = int(str(self.cget('hull_borderwidth')))
         hl = int(str(self.cget('hull_highlightthickness')))
         extra = (bw + hl) * 2
@@ -5652,7 +5648,7 @@ class PanedWidget(MegaWidget):
 class PromptDialog(Dialog):
     def __init__(self, parent = None, **kw):
         # Define the megawidget options.
-        
+
         optiondefs = (
             ('borderx',     20,    INITOPT),
             ('bordery',     20,    INITOPT),
@@ -5710,7 +5706,7 @@ class RadioSelect(MegaWidget):
     def __init__(self, parent = None, **kw):
 
         # Define the megawidget options.
-        
+
         optiondefs = (
             ('buttontype',    'button',      INITOPT),
             ('command',       None,          None),
@@ -5943,7 +5939,7 @@ class ScrolledCanvas(MegaWidget):
     def __init__(self, parent = None, **kw):
 
         # Define the megawidget options.
-        
+
         optiondefs = (
             ('borderframe',    0,            INITOPT),
             ('canvasmargin',   0,            INITOPT),
@@ -6235,7 +6231,7 @@ class ScrolledField(MegaWidget):
     def __init__(self, parent = None, **kw):
 
         # Define the megawidget options.
-        
+
         optiondefs = (
             ('labelmargin',   0,      INITOPT),
             ('labelpos',      None,   INITOPT),
@@ -6293,7 +6289,7 @@ class ScrolledFrame(MegaWidget):
     def __init__(self, parent = None, **kw):
 
         # Define the megawidget options.
-        
+
         optiondefs = (
             ('borderframe',    1,            INITOPT),
             ('horizflex',      'fixed',      self._horizflex),
@@ -6696,7 +6692,7 @@ class ScrolledListBox(MegaWidget):
     def __init__(self, parent = None, **kw):
 
         # Define the megawidget options.
-        
+
         optiondefs = (
             ('dblclickcommand',    None,            None),
             ('hscrollmode',        'dynamic',       self._hscrollMode),
@@ -7072,7 +7068,7 @@ class ScrolledText(MegaWidget):
     def __init__(self, parent = None, **kw):
 
         # Define the megawidget options.
-        
+
         optiondefs = (
             ('borderframe',    0,            INITOPT),
             ('columnheader',   0,            INITOPT),
@@ -7670,7 +7666,7 @@ class SelectionDialog(Dialog):
 
     def __init__(self, parent = None, **kw):
         # Define the megawidget options.
-        
+
         optiondefs = (
             ('borderx',     10,    INITOPT),
             ('bordery',     10,    INITOPT),
@@ -7723,7 +7719,7 @@ forwardmethods(SelectionDialog, ScrolledListBox, '_list')
 class TextDialog(Dialog):
     def __init__(self, parent = None, **kw):
         # Define the megawidget options.
-        
+
         optiondefs = (
             ('borderx',     10,    INITOPT),
             ('bordery',     10,    INITOPT),
@@ -7776,7 +7772,7 @@ class TimeCounter(MegaWidget):
     def __init__(self, parent = None, **kw):
 
         # Define the megawidget options.
-        
+
         optiondefs = (
             ('autorepeat',    1,    None),
             ('buttonaspect',  1.0,  INITOPT),
@@ -8155,7 +8151,7 @@ class AboutDialog(MessageDialog):
     def __init__(self, parent = None, **kw):
 
         # Define the megawidget options.
-        
+
         optiondefs = (
             ('applicationname',   '',          INITOPT),
             ('iconpos',           'w',         None),
@@ -8210,7 +8206,7 @@ class ComboBox(MegaWidget):
     def __init__(self, parent = None, **kw):
 
         # Define the megawidget options.
-        
+
         optiondefs = (
             ('autoclear',          0,          INITOPT),
             ('buttonaspect',       1.0,        INITOPT),
@@ -8595,7 +8591,7 @@ class ComboBoxDialog(Dialog):
 
     def __init__(self, parent = None, **kw):
         # Define the megawidget options.
-        
+
         optiondefs = (
             ('borderx',    10,              INITOPT),
             ('bordery',    10,              INITOPT),
@@ -8658,7 +8654,7 @@ class Counter(MegaWidget):
     def __init__(self, parent = None, **kw):
 
         # Define the megawidget options.
-        
+
         optiondefs = (
             ('autorepeat',     1,             None),
             ('buttonaspect',   1.0,           INITOPT),
@@ -8925,9 +8921,9 @@ forwardmethods(Counter, EntryField, '_counterEntry')
 def _changeNumber(text, factor, increment):
     value = int(text)
     if factor > 0:
-        value = (value // increment) * increment + increment 
+        value = (value // increment) * increment + increment
     else:
-        value = ((value - 1) // increment) * increment  
+        value = ((value - 1) // increment) * increment
 
     return str(value)
 
@@ -9026,7 +9022,7 @@ class CounterDialog(Dialog):
     def __init__(self, parent = None, **kw):
 
         # Define the megawidget options.
-        
+
         optiondefs = (
             ('borderx',    20,  INITOPT),
             ('bordery',    20,  INITOPT),
