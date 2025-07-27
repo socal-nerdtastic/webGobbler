@@ -6,11 +6,13 @@ try:
     from collectors.yahoo import collector_yahooimagesearch
     from collectors.flickr import collector_flickr
     from collectors.deviantart import collector_deviantart
+    from collectors.reddit import collector_reddit
 except ImportError:
     from google import collector_googleimages
     from yahoo import collector_yahooimagesearch
     from flickr import collector_flickr
     from deviantart import collector_deviantart
+    from reddit import collector_reddit
 
 try:
     from collectors.local import collector_local
@@ -25,6 +27,7 @@ ALL_COLLECTORS = [
     collector_yahooimagesearch,
     collector_flickr,
     collector_deviantart,
+    collector_reddit,
     collector_local
 ]
 

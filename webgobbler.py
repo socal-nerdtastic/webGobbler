@@ -758,8 +758,8 @@ class assembler_superpose(threading.Thread):
         drawH = ImageDraw.Draw(horMask)
         drawV = ImageDraw.Draw(verMask)
         for i in range(borderSize):
-            drawH.line( (0, i, horMask.size[0], i) ,fill=256-(256*i/borderSize))
-            drawV.line( (i,0, i, verMask.size[1]) ,fill=256-(256*i/borderSize))
+            drawH.line( (0, i, horMask.size[0], i) ,fill=256-(256*i//borderSize))
+            drawV.line( (i,0, i, verMask.size[1]) ,fill=256-(256*i//borderSize))
         del drawH
         del drawV
 

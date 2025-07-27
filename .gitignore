@@ -2,6 +2,7 @@
 imagepool/
 webGobbler.log
 *.pyc
+*current.bmp
 
 #################
 ## Eclipse
