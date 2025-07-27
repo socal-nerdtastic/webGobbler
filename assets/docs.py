@@ -1,7 +1,5 @@
 #!/usr/bin/python3
 
-VERSION = "webGobbler 3.0.0"
-
 # License text will be used in the GUI.
 LICENSE='''This program is distributed under the OSI-certified zlib/libpng license.
 http://www.opensource.org/licenses/zlib-license.php
@@ -47,6 +45,190 @@ from the original image rights owners for each image composing the whole image.
 (The URLs of the last pictures used to generate current image can be found in the
 last_used_images.html file in the image pool directory.)'''
 
+PROGRAMHELP = '''
+webGobbler creates pictures by assembling images collected from the internet.
+
+Syntax: %s <Running mode> <options>
+
+Running mode (optional):
+
+  --tofile filename : Continuously save generated image to filename
+
+  --singleimage filename : Generate a single image and exit.
+
+  --tohtml filename: Continuously generate an auto-refreshing HTML page
+                     and a JPEG image. filename is the name of the html page.
+                     eg. --tohtml foobar.html
+
+  --towindowswallpaper : Continuously generate a wallpaper for Windows
+
+  --tognomewallpaper   : Same with Gnome using Gconf 2.x
+
+  --tokdewallpaper     : Same with Kde 3.x (and perhaps older versions)
+
+  --xscreensaver       : Start X Window screensaver with XFree86 (no special option
+             available at this time) under Unix / Linux.
+             The program will exit on mouse move or keypress. You will need to start
+             your X server before using this mode.
+
+  /s : Start Windows screensaver (options will be read from registry).
+       (You can change them with --saveconfreg or --guiconfig)
+       The program will exit on mouse move or keypress.
+
+  /c  : Display webGobbler configuration GUI and exit.
+
+  --guiconfig
+      Display webGobbler configuration GUI and exit.
+      Other parameters specified in the command-line will be ignored.
+
+  --saveconffile
+      Save current configuration to file in user's home directory then exit.
+      You can later recall all options with --loadconffile
+
+  --saveconfreg
+      Save current configuration to Windos registry.
+      Then you will not have to specify option in command-line:
+      You can later recall all options with --loadconfreg
+      Use --saveconfreg to specify the options for the screensaver.
+
+If no running mode is specified, webGobbler will start as a GUI application
+and will try to load configuration from registry of .ini file.
+
+
+Options (optionnal):
+
+  --resolution AAAxBBB
+      Resolution to generate (default:1024x768)
+      Ignored by --towindowswallpaper and /s
+
+  --every S
+      Generate new image every S seconds (default: 60)
+
+  --nbimages N
+      Use N images on each generation (default: 10)
+      (This is meaningfull only for assembler_superpose,
+      which is the default assembler)
+
+  --keywords xxx
+      Search the internet for keyword 'xxx'. For example, you can search
+      for cat images only by using --keywords cats
+      Or cat and dogs with: --keywords "cats dogs"
+      (Default: No keywords)
+
+  --norotation
+      Disables image rotation.
+
+  --invert
+      Invert image before saving. This has the effet of a negative.
+      This has the effect of producing a more "white" image.
+
+  --mirror
+      Horizontal mirror of image before saving.
+      This has the effect of making texte unreadable while leaving them
+      in the final picture.
+
+  --emboss
+      Emboss image before saving. This gives a 'rough' aspect to image.
+
+  --resuperpose
+      Rotates and re-superposes the image on itself.
+
+  --bordersmooth x
+      Set the size of the border smoothing. (Default: 30)
+      Set to zero to disable border smoothing.
+
+  --scale x
+      Scale images before superposing them (Default: 1.0)
+      Can be use to create images with more details (with x < 1).
+      (0.5 divides images width and height by 2 before superposing them).
+
+  --variante x
+      Variante for the assembler_superpose (Default: 0)
+      Where x is:
+          0 = standard superpose (Add+Equalize) [RECOMMENDED - better results]
+          1 = old method (Darken+Add+AutoContrast)
+
+  --keepimage
+      Do not delete images from the image pool after use.
+      Images will be reused and when the pool is full, no new image will
+      be downloaded from the internet.
+
+  --pooldirectory XXX
+      Store image pool in this directory.
+      The image pool is the directory where this program will store
+      raw images downloaded from the internet and where it will pickup
+      images to build a new one.
+      The directory will be created if it does not exist.
+      Default: "imagepool" subdirectory.
+
+  --poolnbimages N
+      Try to keep a minimum of N images in the image pool directory.
+      This is not guaranteed: This is only best-effort.
+      Default: 50 images.
+
+  --proxy proxyaddress:proxyport
+      Use this HTTP to connect to the internet.
+      proxyaddress is the proxy address (name or IP address).
+      proxyport is the proxy port (integer)
+      Example: --proxy proxy.free.fr:3128
+
+  --proxyauth login
+  --proxyauth login:password
+      Use this option if the proxy requires authentication.
+      If you do not provide the password in command-line, you will be prompted
+      to type it in when the program starts.
+      Use double-quote if your login or password contains spaces.
+      Examples: --proxyauth "John Smith"
+                --proxyauth "John Smith:mysecretpassword"
+
+  --localonly
+      Do not connect to the internet, but only scan local directories
+      to find images.
+
+  --loadconfreg
+      Load options from Windows registry (instead of specifying all
+      parameters in command-line).
+      This option is automatically set if /s is used.
+
+  --loadconffile
+      Load options from file in user's home directory.
+
+  --debug
+      Display detailed program activity on screen.
+      This is very verbose, but you will see all program activity,
+      including internet connections and image building.
+
+Examples:
+
+  %s --towindowswallpaper
+     Under Windows, this will generate a new wallpaper every 60 seconds
+     in your screen resolution (You will have to wait a few minutes until
+     it gives interesting results.)
+
+  %s --tofile image.png --resolution 640x480 -every 30
+     Generate a new PNG image at 640x480 every 30 seconds.
+
+  %s --towindowswallpaper --norotation --emboss
+     Generate a new wallpaper every 60 seconds.
+     Disable rotation and emboss the generated image.
+
+  %s --towindowswallpaper --proxy netcache.myfirm.com:3128 --proxyauth "John Smith:booz99"
+     Generate Windows wallpaper, and connect to the internet through
+     the proxy netcache.myfirm.com on port 3128 with the login "John Smith"
+     and the password "booz99".
+
+  %s --every 120 --invert --saveconfreg
+     Saves these options in Windows registry for later use with --loadconfreg
+     or /s (Windows screensaver)
+
+  %s /s
+     Call webGobbler as a Windows screenaver.
+     Options will be read from the registry.
+
+  %s --loadconfreg --towindowswallpaper
+     Run the wallpaper changer with the options saved in registry
+     by --saveconfreg.
+'''
 
 README = r'''
 webGobbler 3.0

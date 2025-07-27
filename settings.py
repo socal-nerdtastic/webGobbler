@@ -2,6 +2,9 @@
 
 import sys
 
+__version__ = 3,0,0
+VERSION = "webGobbler "+".".join(map(str, __version__))
+
 CTYPES_AVAILABLE = True
 try:
     import ctypes
@@ -67,7 +70,7 @@ DEFAULTCONFIG = {
 		"network.http.proxy.auth.enabled" : False,      # (boolean) Proxy requires authentication (--proxyauth)
 		"network.http.proxy.auth.login"   : "",         # (string)  Login for proxy.
 		"network.http.proxy.auth.password": "",         # (string)  Password for proxy.
-		"network.http.useragent"     : "webGobbler/1.2.8",# (string) User-agent passed in HTTP requests.
+		"network.http.useragent"     : "webGobbler/"+".".join(map(str, __version__)),# (string) User-agent passed in HTTP requests.
 		"collector.maximumimagesize" : 4000000,         # (integer) Maximum image file size in bytes. If a picture is bigger than this, it will not be downloaded.
 		"collector.acceptedmimetypes": ACCEPTED_MIME_TYPES, # (dictionnary)  List of image types which will be downloaded.
 		"collector.localonly"        : False,           # (boolean) If true, will collect images from local disk instead of internet (--localonly)
