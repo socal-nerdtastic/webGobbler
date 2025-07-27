@@ -52,7 +52,7 @@ class collector_reddit(collector):
     def gather_links(self):
         subreddit = subreddits[self.collectURL]
         self.collectURL += 1
-        if len(subreddits) >= self.collectURL:
+        if len(subreddits) <= self.collectURL:
             self.collectURL = None
 
         self._logDebug("Querying reddit")
