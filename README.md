@@ -15,7 +15,7 @@ You can check the results in the [gallery](http://sebsauvage.net/galerie/?dir=we
 Requirements
 ============
 
-* Python3 (developed with Python3.10)
+* Python3 (developed with Python3.13)
 * Pillow ([Python Imaging Library](https://pypi.org/project/pillow/))
 
 

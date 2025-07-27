@@ -28,9 +28,9 @@ except ImportError as exc:
     raise ImportError("The webGobbler module is required to run this webGobbler configuration GUI. See http://sebsauvage.net/python/webgobbler/\nCould not import module because: %s" % exc)
 
 try:
-  import ImageTk
+  from PIL import ImageTk
 except ImportError as exc:
-  raise ImportError("The PIL (Python Imaging Library) is required to run this program. See http://www.pythonware.com/products/pil/\nUnder Linux, install the packages pythonX.X-imaging and pythonX.X-imaging-tk.\nCould not import module because: %s" % exc) 
+  raise ImportError("The 'pillow' module is required to run this program. See https://pypi.org/project/pillow\nCould not import module because: %s" % exc)
 
 CTYPES_AVAILABLE = True
 try:
@@ -56,7 +56,7 @@ def main():
     return
 #    root = Tkinter.Tk()                       # Initialize Tkinter
 #    Pmw.initialise(root)                      # Initialize Pmw
-#    root.title('webGobbler')    # Set window title.    
+#    root.title('webGobbler')    # Set window title.
 #    wgconfig = wg_application(root)               # Build the GUI.
 #    root.mainloop()                           # Display it and let is operate...
 
@@ -65,7 +65,7 @@ class wg_application:
     Example:
             root = Tkinter.Tk()                       # Initialize Tkinter
             root.title('webGobbler configuration')
-            Pmw.initialise(root)                      # Initialize Pmw            
+            Pmw.initialise(root)                      # Initialize Pmw
             wgconfig = wg_confGUI(root)   # Build the GUI.
             root.mainloop()   # Display it and let is operate...
     '''
@@ -85,22 +85,22 @@ class wg_application:
         self.closing = False            # If True, the application is currently closing (probably waiting for network connections to close.)
         self.currentlyAssembling = False # Is the assemble currently assembling ?
         self._widgets= {}               # List of stateful widgets
-    
+
 
         self._initializeGUI()  # Create the GUI
         self.setStatus("webGobbler running.")
-        self.timerCollectorsStatus = self._parent.after(250, self._updateCollectorStatus) 
-        
-        self._updateImage()   # Regularly update the image from the assembler. 
+        self.timerCollectorsStatus = self._parent.after(250, self._updateCollectorStatus)
+
+        self._updateImage()   # Regularly update the image from the assembler.
         self.handlerGenerateNow()  # Generate a new image right now.
-   
+
     def _setCollectorStatus(self,collectorName,status,information):
         ''' Sets the collector status and info.
-            Input : 
+            Input :
                 collectorName (string) : the name of the collector (eg."collector_googleimages")
                 status (string) : Status to display (eg."Downloading")
                 information (string) : information to display (eg."http://...")
-                
+
                 If collectorName does not exist, does nothing.
         '''
         widgets = (None, None)
@@ -112,15 +112,15 @@ class wg_application:
 
         # If there is such widget, display its status:
         if widgets != (None,None):
-            widgets[0].configure(text=status)       
-            widgets[1].configure(text=information)      
-   
+            widgets[0].configure(text=status)
+            widgets[1].configure(text=information)
+
     def _updateCollectorStatus(self):
-        ''' Update the collectors status on screen. 
+        ''' Update the collectors status on screen.
             This method is called every 0.5 seconds.
         '''
         # We poll each collector status every second.
-        
+
         # The known collectors:
         visitedCollectors = { "collector_googleimages": False,
                                "collector_yahooimagesearch": False,
@@ -129,7 +129,7 @@ class wg_application:
                                "collector_local": False
                              }
 
-        # Get the status of all collectors present in the assembler's pool:                     
+        # Get the status of all collectors present in the assembler's pool:
         for collector in self.assembler.pool.collectors:
             # Get the status of this collector:
             (status,information) = collector.getCurrentStatus()   # .getCurrentStatus() is thread safe.
@@ -137,37 +137,37 @@ class wg_application:
             self._setCollectorStatus(collector.name,status,information)
             # Now mark this collector as "visited".
             visitedCollectors[collector.name] = 1
-        
+
         # Now put status "Stop" in all collectors we could not get status from.
         # (If they are not present in the assembler's pool, it means they
         # are de-activated)
         for (collectorName,visited) in list(visitedCollectors.items()):
             if not visited:
                 self._setCollectorStatus(collectorName,'Off','')
-        
+
         self.poolSize.configure(text = "%d on %d" % ( self.assembler.pool.getPoolSize(),self.config['pool.nbimages']))
-        
+
 
         # Superpose a new image if delay is elapsed:
         if time.time() > (self.lastImageDate + self.config["program.every"]) and not self.currentlyAssembling:
             self._superpose()
-        # Update also the state of the assembler:       
+        # Update also the state of the assembler:
         assemblerText = self.assembler.state
         if not self.currentlyAssembling and not self.closing:
              assemblerText += "  (Next image in %d seconds)" % (int(self.lastImageDate + self.config["program.every"]- time.time()+1) )
         self.assemblerState.configure(text=assemblerText)
 
         self.timerCollectorsStatus = self._parent.after(250, self._updateCollectorStatus)  # 0.25 seconds
-        
-        
-   
+
+
+
     def _updateImage(self):
         ''' Update the image in window from the assembler.
             This method will be automatically call every second by the Tkinter main loop timer.
         '''
         # We pool the assembler every second to see if it has generated a new
         # image.
-        # If it has, we try to get the image and display it. 
+        # If it has, we try to get the image and display it.
         if self.lastImageDate != self.assembler.finalImageCompletionDate and not self.closing:
             # Get the new image:
             image = self.assembler.getImage()
@@ -181,19 +181,19 @@ class wg_application:
                 self._setWallpaper()
                 self.currentlyAssembling = False
                 self._widgets['updateimage.button'].configure(state='normal')  # Enable the "Update image" button
-                
+
                 # If the "Auto-save" checkbox is checked, save the image.
                 if self._widgets['autosave.value'].get()!=0:
                    filename = time.strftime("%Y%m%d_%H%M%S")+".bmp"
                    self.setStatus("Saving image as %s..." % filename)
                    self.lastImage.save(filename)
                 self.setStatus("webGobbler running.")
-                
+
         # If the application is closing and the assembler has died, we can destroy the window.
-        if self.closing and not self.assembler.isAlive():            
+        if self.closing and not self.assembler.isAlive():
             self.assembler.join()
             self._parent.destroy()
-        
+
         self.timerUpdateimage = self._parent.after(1000, self._updateImage)  # Re-arm the timer.
 
     # FIXME: display errors ?  (network errors, etc. ?)
@@ -207,12 +207,12 @@ class wg_application:
                 filepath = os.path.join(self.config['persistencedirectory'],'wallpaper.bmp')
                 self.lastImage.save(filepath)
                 SPI_SETDESKWALLPAPER = 20 # According to http://support.microsoft.com/default.aspx?scid=97142
-                ctypes.windll.user32.SystemParametersInfoA(SPI_SETDESKWALLPAPER, 0, filepath , 0)                       
+                ctypes.windll.user32.SystemParametersInfoA(SPI_SETDESKWALLPAPER, 0, filepath , 0)
             # FIXME: Implement for Gnome and KDE.
 
     def _superpose(self):
         ''' Ask the assembler to superpose new images regularly.
-            This method will be automatically call by the Tkinter main loop timer.        
+            This method will be automatically call by the Tkinter main loop timer.
         '''
         if self.closing: return
         if self.currentlyAssembling: return
@@ -220,7 +220,7 @@ class wg_application:
         self._widgets['updateimage.button'].configure(state='disabled')  # Disable the "Update image" button
         self.setStatus('Updating current image (%d x %d).' % (self.config['assembler.sizex'],self.config['assembler.sizey']))
         self.assembler.superpose()  # (This is a non-blocking call.)
-        
+
     def loadConfig(self,appConfig=None):
         ''' Read webGobbler configuration from registry or .INI file.
             If the registry is not available, the .ini file will be read.
@@ -239,7 +239,7 @@ class wg_application:
             pass
         except WindowsError:
             pass
-        
+
         if self.configSource == None:
             # We are probably not under Windows, or the registry could not be read.
             # We try to read the .ini file in user's home directory:
@@ -249,17 +249,17 @@ class wg_application:
             except:
                 self.configSource = 'default'
                 #self.handlerConfigure()  # Display configuration screen right now.
-        
+
     def _initializeGUI(self):
         ''' This method creates all the GUI widgets. '''
 
-        smallFont = tkinter.font.Font(size=-11) 
-        smallFontBold = tkinter.font.Font(size=-11,weight='bold') 
-                
+        smallFont = tkinter.font.Font(size=-11)
+        smallFontBold = tkinter.font.Font(size=-11,weight='bold')
+
         # ======================================================================
-        # Create the menu        
+        # Create the menu
         mainmenu = tkinter.Menu(self._parent)
-        self._parent.config(menu=mainmenu)        
+        self._parent.config(menu=mainmenu)
         filemenu = tkinter.Menu(mainmenu)
         mainmenu.add_cascade(label="File", menu=filemenu)
         filemenu.add_command(label="Start new image from scratch",command=self.handlerStartNewImage)
@@ -268,51 +268,51 @@ class wg_application:
         filemenu.add_command(label="Save as...",command=self.handlerSaveAs)
         filemenu.add_separator()
         filemenu.add_command(label="Exit",command=self.handlerExit)
-        
+
         optionsMenu = tkinter.Menu(mainmenu)
         mainmenu.add_cascade(label="Options", menu=optionsMenu)
         optionsMenu.add_command(label="Configure...", command=self.handlerConfigure)
-        
+
         v = tkinter.IntVar()
         self.setAsWallpaper = v
-        
+
         if sys.platform=="win32" and CTYPES_AVAILABLE:
             # (If ctypes is not available, we won't be able to set the Windows wallpaper,
             # so let's disable the option.)
             cb = optionsMenu.add_checkbutton(label='Set as wallpaper',variable=v,command=self.handlerSetAsWallpaper)
         # FIXME: Implement this option for Gnome and KDE.
-                
+
         helpmenu = tkinter.Menu(mainmenu)
         mainmenu.add_cascade(label="Help", menu=helpmenu)
         helpmenu.add_command(label="About...", command=self.handlerAbout)
-        
-        
+
+
         # ======================================================================
         # The buttons area (Save, Update now, etc.)
         self.buttonsArea = tkinter.Frame(self._parent)
         self.buttonsArea.grid(column=1,row=0,sticky='ewn',padx=3)
-        
+
         self.saveButton = tkinter.Button(self.buttonsArea,text="Save\nimage",command=self.handlerSaveAsForButton)
         self.saveButton.grid(column=0,row=0,sticky='EW',padx=3)
-        
+
         v = tkinter.IntVar(); self._widgets['autosave.value'] = v
         self._widgets['autosave.checkbox'] = tkinter.Checkbutton(self.buttonsArea,variable=v,text="Auto-save")
-        self._widgets['autosave.checkbox'].grid(column=0,row=1,sticky='W',padx=3)       
-        
+        self._widgets['autosave.checkbox'].grid(column=0,row=1,sticky='W',padx=3)
+
         self._widgets['updateimage.button'] = tkinter.Button(self.buttonsArea,text="Update\nimage",command=self.handlerGenerateNow)
         self._widgets['updateimage.button'].grid(column=0,row=2,sticky='EWS',padx=3,pady=20)
-        
+
         # ======================================================================
         # The status bar
         self.statusFrame = tkinter.Frame(self._parent)
-        #self.statusFrame.pack(side='top',fill='x',expand=1)      
+        #self.statusFrame.pack(side='top',fill='x',expand=1)
         self.statusFrame.grid(column=0,row=0,sticky='ew')
-        
+
         # The Google status:
         tkinter.Label(self.statusFrame,text='Google',anchor='w',bd=1,relief='sunken',font=smallFontBold).grid(column=0,row=0,sticky='ew')
         self.googleStatus = tkinter.Label(self.statusFrame,text="Off",anchor='w',bd=1,relief='sunken',font=smallFont);  self.googleStatus.grid(column=1,row=0,sticky='ew')
         self.googleInfo = tkinter.Label(self.statusFrame,text="",anchor='w',bd=1,relief='sunken',font=smallFont); self.googleInfo.grid(column=2,row=0,sticky='ew')
-        
+
         # The Yahoo status:
         tkinter.Label(self.statusFrame,text='Yahoo',anchor='w',bd=1,relief='sunken',font=smallFontBold).grid(column=0,row=1,sticky='ew')
         self.yahooStatus = tkinter.Label(self.statusFrame,text="Off",anchor='w',bd=1,relief='sunken',font=smallFont); self.yahooStatus.grid(column=1,row=1,sticky='ew')
@@ -322,7 +322,7 @@ class wg_application:
         tkinter.Label(self.statusFrame,text='Flickr',anchor='w',bd=1,relief='sunken',font=smallFontBold).grid(column=0,row=3,sticky='ew')
         self.flickrStatus = tkinter.Label(self.statusFrame,text="Off",anchor='w',bd=1,relief='sunken',font=smallFont); self.flickrStatus.grid(column=1,row=3,sticky='ew')
         self.flickrInfo = tkinter.Label(self.statusFrame,text="",anchor='w',bd=1,relief='sunken',font=smallFont); self.flickrInfo.grid(column=2,row=3,sticky='ew')
-        
+
         # The DeviantArt status:
         tkinter.Label(self.statusFrame,text='DeviantArt',anchor='w',bd=1,relief='sunken',font=smallFontBold).grid(column=0,row=4,sticky='ew')
         self.deviantArtStatus = tkinter.Label(self.statusFrame,text="Off",anchor='w',bd=1,relief='sunken',font=smallFont); self.deviantArtStatus.grid(column=1,row=4,sticky='ew')
@@ -332,7 +332,7 @@ class wg_application:
         tkinter.Label(self.statusFrame,text='Local disk',anchor='w',bd=1,relief='sunken',font=smallFontBold).grid(column=0,row=5,sticky='ew')
         self.localdiskStatus = tkinter.Label(self.statusFrame,text="Off",anchor='w',bd=1,relief='sunken',font=smallFont); self.localdiskStatus.grid(column=1,row=5,sticky='ew')
         self.localdiskInfo = tkinter.Label(self.statusFrame,text="",anchor='w',bd=1,relief='sunken',font=smallFont); self.localdiskInfo.grid(column=2,row=5,sticky='ew')
-        
+
         # The pool state:
         tkinter.Label(self.statusFrame,text='Number of images in pool:',anchor='w',bd=1,relief='sunken',font=smallFontBold).grid(column=0,row=6,sticky='ew',columnspan=2)
         self.poolSize = tkinter.Label(self.statusFrame,text="",anchor='w',bd=1,relief='sunken',font=smallFont); self.poolSize.grid(column=2,row=6,sticky='ew')
@@ -340,20 +340,20 @@ class wg_application:
         # The image assembler state:
         tkinter.Label(self.statusFrame,text='Image assembler:',anchor='w',bd=1,relief='sunken',font=smallFontBold).grid(column=0,row=7,sticky='ew',columnspan=2)
         self.assemblerState = tkinter.Label(self.statusFrame,text="Waiting",anchor='w',bd=1,relief='sunken',font=smallFont); self.assemblerState.grid(column=2,row=7,sticky='ew')
-        
-        
+
+
         # Allow the information columns to expand
         self.statusFrame.columnconfigure(1,minsize=95)
         self.statusFrame.columnconfigure(2,weight=1,minsize=200)
 
-        
+
         # ======================================================================
         # The scrollable frame which contains the image:
         sf = Pmw.ScrolledFrame(self._parent)
         sf.grid(column=0,row=1,stick='news',columnspan=2)
         self.imageLabel = tkinter.Label(sf.interior())  # This widget will hold the image.
         self.imageLabel.pack(fill='both', expand=1)
-        
+
         # ======================================================================
         # The status bar.
         statusFrame = tkinter.Frame(self._parent,bd=1,relief='sunken')
@@ -361,25 +361,25 @@ class wg_application:
         self.statusLabel = tkinter.Label(statusFrame,text="",anchor='w',font=smallFont)
         self.statusLabel.grid(column=0,row=0,sticky='w')
         statusFrame.grid_columnconfigure(0,weight=1)
-        
+
         # Configure auto-resize of widgets:
         self._parent.rowconfigure(1,weight=1,minsize=0)
         self._parent.columnconfigure(0,weight=1,minsize=200)
 
         # Prevent the Window to resize if a long URL is displayed:
         self._parent.propagate(False)
-        
+
         # Default window geometry is 1x1+0+0, which is "autosize".
         # When this geometry is used, the window automatically resizes
         # despite the self._parent.propagate(False)
         # So we force the Window geometry:
         self._parent.geometry('500x400')
-        
+
 
     def setStatus(self,text):
         ''' Set the status bar text. '''
         self.statusLabel.configure(text=text)
-     
+
     def handlerExit(self):
         # Note about the line below:
         # When I issue a self.assembler.shutdown() command, all threads
@@ -397,35 +397,35 @@ class wg_application:
             self.setStatus("Finishing current downloads - Please wait...")
         self.assembler.shutdown()
         self.closing = True
-    
+
     def handlerAbout(self):
-        import webgobbler_config       
+        import webgobbler_config
         wgconfig = webgobbler_config.wg_confGUI(None)  # Display webGobbler configuration screen.
-        wgconfig.focus_set()        
+        wgconfig.focus_set()
         wgconfig.showAbout()
         self._parent.wait_window(wgconfig.top)  # Wait for window to close.
-    
+
     def handlerConfigure(self):
-        import webgobbler_config       
+        import webgobbler_config
         # FIXME: grey out menues so that user does not call the config Windows several times at once.
         wgconfig = webgobbler_config.wg_confGUI(None)  # Display webGobbler configuration screen.
         # webGobbler configuration windows will read configuration from registry or .ini file.
-        wgconfig.focus_set()        
+        wgconfig.focus_set()
         self._parent.wait_window(wgconfig.top)  # Wait for window to close.
         if wgconfig.configChanged:
-            # Configuration was changed. 
+            # Configuration was changed.
             self.config = wgconfig.config   # Get the new configuration
             # Kill the old assembler:
-            self.assembler.shutdown()   
+            self.assembler.shutdown()
             #self.assembler.join()
-            
+
             # Set the new proxy address (if any)
             self.config = webgobbler.setUrllibProxy(log=None,CONFIG=self.config)
-            
+
             # Start a new assembler with this new configuration:
             self.assembler = webgobbler.assembler_superpose(pool=webgobbler.imagePool(config=self.config),config=self.config)
             self.assembler.start()
-     
+
     def handlerGenerateNow(self):
         if self.currentlyAssembling: return
         self.currentlyAssembling = True
@@ -453,7 +453,7 @@ class wg_application:
                  message_text = 'Do you really want to discard current image and start a new one ?',
                  buttons = ('Yes,\nstart new image', 'NO,\nkeep current image'),
                  defaultbutton = 'NO,\keep current image')
-        result = dialog.activate()     
+        result = dialog.activate()
         dialog.withdraw()
         if result == 'Yes,\nstart new image':
             self.assembler.shutdown()     # Stop current assembler.
@@ -462,8 +462,8 @@ class wg_application:
             self.assembler = webgobbler.assembler_superpose(pool=webgobbler.imagePool(config=self.config),config=self.config,ignorePreviousImage=True)
             self.assembler.start()
             self.handlerGenerateNow()  # Generate a new image right now.
-            
-    
+
+
     def handlerSetAsWallpaper(self):
         self._setWallpaper()
 
