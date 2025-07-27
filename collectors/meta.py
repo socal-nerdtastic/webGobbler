@@ -78,7 +78,7 @@ class internetImage:
 
         # If the returned Content-Type is not recognized, ignore the file.
         # ("image/jpeg", "image/gif", etc.)
-        MIME_Type = urlfile.info().getheader("Content-Type","")
+        MIME_Type = urlfile.info().get_content_type()
         if MIME_Type not in self.CONFIG["collector.acceptedmimetypes"]:
             urlfile.close()
             self.discardReason = "not an image (%s)" % MIME_Type
@@ -92,13 +92,17 @@ class internetImage:
         # (so that we can abort the download right now if the file is too big.)
         file_size = 0
         try:
-            file_size = int( urlfile.info().getheader("Content-Length","0") )
-        except ValueError: # Content-Length does not contains an integer
+            file_size = urlfile.length
+        except AttributeError: # Content-Length does not contains an integer
             urlfile.close()
             self.discardReason = "bogus data in Content-Length HTTP headers"
             return  # Discard this image.
         # Note that Content-Length header can be missing. That's not a problem.
-        if file_size > self.CONFIG["collector.maximumimagesize"]:
+        if file_size is None:
+            urlfile.close()
+            self.discardReason = "no size"
+            return  # no size defined !  Discard it.
+        elif file_size > self.CONFIG["collector.maximumimagesize"]:
             urlfile.close()
             self.discardReason = "too big"
             return  # Image too big !  Discard it.
@@ -133,7 +137,7 @@ class internetImage:
             self.discardReason = "blacklisted"
             return
         self.filename = 'WG'+imagesha1+file_extension  # SHA1 in hex + image extension
-        self.imagedata += self.CONFIG["pool.sourcemark"] + self.imageurl   # Add original URL in image file
+        self.imagedata += self.CONFIG["pool.sourcemark"].encode() + self.imageurl.encode()   # Add original URL in image file
 
         self.discardReason = ""
         self.isNotAnImage = False  # The image is ok.
@@ -350,18 +354,20 @@ class collector(threading.Thread):
               if (!results): print "No results."
       '''
       htmlpage = ''
-      results = None
+      results = []
       try:
           request_headers = { 'User-Agent': self.CONFIG["network.http.useragent"] }
           request = urllib.request.Request(url, None, request_headers)  # Build the HTTP request
           htmlpage = urllib.request.urlopen(request).read(2000000)  # Read at most 2 Mb.
+          htmlpage = htmlpage.decode('latin-1')
           # FIXME: catch specific HTTP errors ?
           # FIXME: return HTTP errors ?
       except Exception as exc:
           self._logError('parsePage("'+url+'"): '+repr(exc))
           return (None,None)
-      if regex: results = regex.findall(htmlpage)
-      return (htmlpage,results)
+      if regex:
+          results = regex.findall(htmlpage)
+      return (htmlpage, results)
 
 class collector_local(collector):
     ''' This collector does not use the internet and only searches local harddisks

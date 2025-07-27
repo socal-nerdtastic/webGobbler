@@ -72,7 +72,7 @@ DEFAULTCONFIG = {
         "network.http.proxy.auth.password": "",         # (string)  Password for proxy.
         "network.http.useragent"     : "webGobbler/"+".".join(map(str, __version__)),# (string) User-agent passed in HTTP requests.
         "collector.maximumimagesize" : 4000000,         # (integer) Maximum image file size in bytes. If a picture is bigger than this, it will not be downloaded.
-        "collector.acceptedmimetypes": ACCEPTED_MIME_TYPES, # (dictionnary)  List of image types which will be downloaded.
+        "collector.acceptedmimetypes": ACCEPTED_MIME_TYPES, # (dictionary)  List of image types which will be downloaded.
         "collector.localonly"        : False,           # (boolean) If true, will collect images from local disk instead of internet (--localonly)
         "collector.localonly.startdir" : "/",           # (string) When using local disk only, the directory to scan for images (default="/"=Whole disk.)
         "collector.keywords.enabled" : False,           # (boolean) Use keywords for image search. If False, random generated words will be used.

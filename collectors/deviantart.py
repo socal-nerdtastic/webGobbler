@@ -20,7 +20,7 @@ class collector_deviantart(collector):
         Used by: imagePool.
     '''
     name="collector_deviantart"
-    source="Obsolete"
+    source="deviantART"
 
     # Regular expression used to extract the image URL from a random deviant Art page.
     RE_IMAGEURL = re.compile(r'<meta name="og:image" content="(.+?\.(jpg|png|gif))">',re.DOTALL|re.IGNORECASE)

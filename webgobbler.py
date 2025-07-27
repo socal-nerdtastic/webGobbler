@@ -283,7 +283,7 @@ class assembler_simple(assembler):
             image = image.convert('RGB')
         (imagex, imagey) = image.size
         if (imagex != self.CONFIG["assembler.sizex"] or imagey != self.CONFIG["assembler.sizey"]):
-            image.thumbnail((self.CONFIG["assembler.sizex"],self.CONFIG["assembler.sizey"]),Image.ANTIALIAS)
+            image.thumbnail((self.CONFIG["assembler.sizex"],self.CONFIG["assembler.sizey"]),Image.LANCZOS)
         if self.CONFIG["assembler.mirror"]:
             image = ImageOps.mirror(image)
         if self.CONFIG["assembler.emboss"]:
@@ -339,11 +339,11 @@ class assembler_mosaic(assembler):
                 if image.mode != 'RGB':
                     image = image.convert('RGB')
                 if resizeMethod==1:
-                    image = ImageOps.fit(image,size=(imageSizeX,imageSizeY),method=Image.ANTIALIAS,bleed=0,centering=(0.5,0.5))
+                    image = ImageOps.fit(image,size=(imageSizeX,imageSizeY),method=Image.LANCZOS,bleed=0,centering=(0.5,0.5))
                 if resizeMethod==2:
-                    image = image.resize((imageSizeX,imageSizeY),Image.ANTIALIAS)
+                    image = image.resize((imageSizeX,imageSizeY),Image.LANCZOS)
                 else:
-                    image.thumbnail((imageSizeX,imageSizeY),Image.ANTIALIAS)
+                    image.thumbnail((imageSizeX,imageSizeY),Image.LANCZOS)
                 finalImage.paste(image,(x*imageSizeX,y*imageSizeY))
         if self.CONFIG["assembler.mirror"]:
             finalImage = ImageOps.mirror(finalImage)
@@ -517,7 +517,7 @@ class assembler_superpose(threading.Thread):
         (imagex,imagey) = imageToSuperpose.size
         if (imagex > self.CONFIG["assembler.sizex"]) or (imagey > self.CONFIG["assembler.sizey"]):
             try:
-                imageToSuperpose.thumbnail((self.CONFIG["assembler.sizex"]/2,self.CONFIG["assembler.sizey"]/2),Image.ANTIALIAS)
+                imageToSuperpose.thumbnail((self.CONFIG["assembler.sizex"]/2,self.CONFIG["assembler.sizey"]/2),Image.LANCZOS)
             except TypeError:  #TypeError: unsubscriptable object  ; Spurious exception in PIL.  :-(
                 raise BadImage
             (imagex,imagey) = imageToSuperpose.size
@@ -526,7 +526,7 @@ class assembler_superpose(threading.Thread):
         scaleValue = self.CONFIG["assembler.superpose.scale"]
         if str(scaleValue) != "1.0":
             try:
-                imageToSuperpose.thumbnail((int(float(imagex)*scaleValue),int(float(imagey)*scaleValue)),Image.ANTIALIAS)
+                imageToSuperpose.thumbnail((int(float(imagex)*scaleValue),int(float(imagey)*scaleValue)),Image.LANCZOS)
             except TypeError:  #TypeError: unsubscriptable object  ; Spurious exception in PIL.  :-(
                 raise BadImage
             (imagex,imagey) = imageToSuperpose.size
@@ -663,7 +663,7 @@ class assembler_superpose(threading.Thread):
             if (imagex!=self.CONFIG["assembler.sizex"]) or (imagey!=self.CONFIG["assembler.sizey"]):
                 if self.currentImage.mode != 'RGB':
                     self.currentImage = self.currentImage.convert('RGB')
-                self.currentImage = self.currentImage.resize((self.CONFIG["assembler.sizex"],self.CONFIG["assembler.sizey"]),Image.ANTIALIAS)
+                self.currentImage = self.currentImage.resize((self.CONFIG["assembler.sizex"],self.CONFIG["assembler.sizey"]),Image.LANCZOS)
                 self._logDebug("Starting from previous image resized.")
             else:
                 self._logDebug("Starting from previous image.")

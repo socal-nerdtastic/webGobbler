@@ -24,7 +24,7 @@ ALL_COLLECTORS = [
     collector_googleimages,
     collector_yahooimagesearch,
     collector_flickr,
-    # ~ collector_deviantart,
+    collector_deviantart,
     collector_local
 ]
 
@@ -32,10 +32,5 @@ def get_collectors(config):
     if config["collector.localonly"]:
         return [collector_local(config=config)]
     else:
-        return [
-            collector_googleimages(config=config),
-            collector_yahooimagesearch(config=config),
-            collector_flickr(config=config),
-            # ~ collector_deviantart(config=config)
-            ]
+        return [coll(config=config) for coll in ALL_COLLECTORS if coll is not collector_local]
 

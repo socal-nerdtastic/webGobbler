@@ -19,8 +19,8 @@ class collector_yahooimagesearch(collector):
     '''
     name="collector_yahooimagesearch"
     source='Yahoo'
-    #RE_IMAGEURL = re.compile('&imgcurl=(.+?)&',re.DOTALL|re.IGNORECASE)
-    RE_IMAGEURL = re.compile('&imgurl=(.+?)&',re.DOTALL|re.IGNORECASE)
+    #RE_IMAGEURL = re.compile(r'&imgcurl=(.+?)&',re.DOTALL|re.IGNORECASE)
+    RE_IMAGEURL = re.compile(r'&imgurl=(.+?)&',re.DOTALL|re.IGNORECASE)
     def __init__(self,**keywords):
         collector.__init__(self,**keywords)
         self.imageurls = {}  # image URLs extracted from html result pages.
@@ -44,15 +44,12 @@ class collector_yahooimagesearch(collector):
                 # We also get a random result page (between 0-50)
                 try:
                     request_url = "http://images.search.yahoo.com/search/images?p=%s&b=%s" % (urllib.parse.quote_plus(wordToSearch), random.randint(0,50)*20+1)
-                    request_headers = { 'User-Agent': self.CONFIG["network.http.useragent"] }
-                    request = urllib.request.Request(request_url, None, request_headers)  # Build the HTTP request
-                    htmlpage = urllib.request.urlopen(request).read(500000)
+                    htmlpage, results = self._parsePage(request_url, collector_yahooimagesearch.RE_IMAGEURL)
                 except:
                     self._logWarning("Unable to contact images.search.yahoo.com. Waiting 60 seconds.")
                     self._setCurrentStatus('Error','Unable to contact images.search.yahoo.com. Waiting 60 seconds.')
                     self.waituntil = time.time()+60
                     return
-                results = collector_yahooimagesearch.RE_IMAGEURL.findall(htmlpage)
                 if len(results) > 0:
                     for imageurl in results:
                         # Keep some of those URLs in memory.
